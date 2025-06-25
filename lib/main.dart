@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passenger_app/screens/login_screen.dart';
+import 'package:passenger_app/screens/register_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,6 +18,9 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Roboto',
       ),
       home: const Logingscreen(),
+      routes: {
+        '/register': (context) => const RegisterScreen(), // 👈 Named route
+      },
     );
   }
 }

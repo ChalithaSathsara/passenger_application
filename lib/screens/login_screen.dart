@@ -107,11 +107,11 @@ class _LogingscreenState extends State<Logingscreen> {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            Color(0xFFE65100), // Deep orange (start)
-            Color(0xFFFF6D00), // Bright orange (light)
-            Color(0xFFD65A00), // Medium dark orange (middle - subtle darker)
-            Color(0xFFFF6D00), // Bright orange (light)
-            Color(0xFFE65100), // Deep orange (end)
+            Color(0xFFBD2D01),
+            Color(0xFFCF4602),
+            Color(0xFFCF4602),
+            Color(0xFFCF4602),
+            Color(0xFFBD2D01),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -182,20 +182,21 @@ class _LogingscreenState extends State<Logingscreen> {
             color: Colors.black.withOpacity(0.2),
             spreadRadius: 1,
             blurRadius: 6,
-            offset: const Offset(0, 4), // shadow direction: bottom right
+            offset: const Offset(0, 4),
           ),
         ],
         borderRadius: BorderRadius.circular(10),
       ),
       child: SizedBox(
-        width: double.infinity, // full width
+        width: double.infinity,
         child: OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 14),
             backgroundColor: Colors.white,
             side: const BorderSide(
-              color: Colors.transparent,
-            ), // no outline border
+              color: Colors.black, // changed from transparent to black
+              width: 2, // thicker border width
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -203,7 +204,10 @@ class _LogingscreenState extends State<Logingscreen> {
           icon: Image.asset('assets/images/google.png', height: 20),
           label: const Text(
             'Continue with Google',
-            style: TextStyle(color: Colors.black),
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold, // make text bold
+            ),
           ),
           onPressed: () {
             print("Google login clicked");
@@ -219,7 +223,12 @@ class _LogingscreenState extends State<Logingscreen> {
       children: [
         const Text('No account?', style: TextStyle(fontSize: 13)),
         TextButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushNamed(
+              context,
+              '/register',
+            ); // 👈 Navigate to RegisterPage
+          },
           child: const Text(
             'Register',
             style: TextStyle(
@@ -237,7 +246,7 @@ class _LogingscreenState extends State<Logingscreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        // Use a Container to apply gradient background
+        // Use a Container to apply vertical gradient background
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -247,8 +256,8 @@ class _LogingscreenState extends State<Logingscreen> {
               Color(0xFFCF4602),
               Color(0xFFBD2D01),
             ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             stops: [0.0, 0.25, 0.5, 0.75, 1.0],
           ),
         ),
@@ -261,9 +270,9 @@ class _LogingscreenState extends State<Logingscreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 20), // reduced top spacing
+                  const SizedBox(height: 20), // top spacing
                   _buildLogo(),
-                  const SizedBox(height: 15), // reduced spacing
+                  const SizedBox(height: 15), // spacing after logo
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 30),
                     decoration: BoxDecoration(
@@ -286,13 +295,13 @@ class _LogingscreenState extends State<Logingscreen> {
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 12,
-                    ), // reduced vertical padding
+                    ),
                     child: Form(
                       key: _formKey,
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Gradient Login Text
+                          // Gradient Login Text with vertical gradient
                           ShaderMask(
                             shaderCallback: (Rect bounds) {
                               return const LinearGradient(
@@ -303,8 +312,8 @@ class _LogingscreenState extends State<Logingscreen> {
                                   Color(0xFFCF4602),
                                   Color(0xFFBD2D01),
                                 ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
                                 stops: [0.0, 0.25, 0.5, 0.75, 1.0],
                               ).createShader(bounds);
                             },
@@ -313,8 +322,7 @@ class _LogingscreenState extends State<Logingscreen> {
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: Colors
-                                    .white, // color must be set for ShaderMask
+                                color: Colors.white, // required for ShaderMask
                               ),
                             ),
                           ),
@@ -335,7 +343,7 @@ class _LogingscreenState extends State<Logingscreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20), // reduced bottom spacing
+                  const SizedBox(height: 20), // bottom spacing
                 ],
               ),
             ),
