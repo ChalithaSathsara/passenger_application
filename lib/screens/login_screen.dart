@@ -292,12 +292,30 @@ class _LogingscreenState extends State<Logingscreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text(
-                            'Login',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.deepOrange,
+                          // Gradient Login Text
+                          ShaderMask(
+                            shaderCallback: (Rect bounds) {
+                              return const LinearGradient(
+                                colors: [
+                                  Color(0xFFBD2D01),
+                                  Color(0xFFCF4602),
+                                  Color(0xFFF67F00),
+                                  Color(0xFFCF4602),
+                                  Color(0xFFBD2D01),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+                              ).createShader(bounds);
+                            },
+                            child: const Text(
+                              'Login',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors
+                                    .white, // color must be set for ShaderMask
+                              ),
                             ),
                           ),
                           const SizedBox(height: 16),
