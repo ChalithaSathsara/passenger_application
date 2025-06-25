@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:passenger_app/screens/login_screen.dart';
 import 'package:passenger_app/screens/register_screen.dart';
+import 'package:passenger_app/screens/forget_password_screen.dart';
+import 'package:passenger_app/screens/forget_password_email_verification_screen.dart';
+import 'package:passenger_app/screens/forget_password_enter_new_password_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +20,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: 'Roboto',
       ),
-      home: const Logingscreen(),
+      home: const EmailVerificationScreen(),
       routes: {
         '/register': (context) => const RegisterScreen(), // 👈 Named route
       },
