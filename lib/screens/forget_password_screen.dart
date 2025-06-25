@@ -56,7 +56,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return const Text(
       "Enter the email address associated\nwith your account",
       textAlign: TextAlign.center,
-      style: TextStyle(fontSize: 13, color: Colors.black),
+      style: TextStyle(fontSize: 13, color: Color.fromARGB(255, 120, 118, 118)),
     );
   }
 
@@ -83,6 +83,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   Widget _buildRecoverButton() {
     return Container(
+      width: double
+          .infinity, // Let it naturally fill the form card’s internal padding
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
@@ -104,12 +106,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       ),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
+          minimumSize: const Size.fromHeight(50), // Match height visually
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          padding: EdgeInsets.zero, // Button padding handled by container
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, '/RecoverPassword');
+        },
         child: const Text(
           "Recover Password",
           style: TextStyle(

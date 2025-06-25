@@ -89,7 +89,9 @@ class _LogingscreenState extends State<Logingscreen> {
     return Align(
       alignment: Alignment.centerRight,
       child: TextButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, '/forget');
+        },
         child: const Text(
           'Forget Password?',
           style: TextStyle(

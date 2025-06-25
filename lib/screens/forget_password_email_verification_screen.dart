@@ -77,9 +77,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         ).createShader(bounds);
       },
       child: const Text(
-        "Email Verification",
+        "Get Your Code",
         style: TextStyle(
-          fontSize: 18,
+          fontSize: 20,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
@@ -89,9 +89,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
   Widget _buildSubtitleText() {
     return const Text(
-      "Enter the verification code we just sent to your email address.",
+      "Please enter the 4-digit code that sent to your email address.",
       textAlign: TextAlign.center,
-      style: TextStyle(fontSize: 13, color: Colors.black),
+      style: TextStyle(fontSize: 13, color: Color.fromARGB(255, 120, 118, 118)),
     );
   }
 
@@ -99,27 +99,43 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: List.generate(4, (index) {
-        return SizedBox(
+        return Container(
           width: 50,
+          height: 60,
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFE5D0),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color.fromARGB(
+                255,
+                246,
+                182,
+                139,
+              ), // low orange border
+              width: 1, // subtle
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
           child: TextField(
             controller: _otpControllers[index],
             focusNode: _focusNodes[index],
             textAlign: TextAlign.center,
             keyboardType: TextInputType.number,
-            maxLength: 4,
+            maxLength: 1,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             onChanged: (value) => _handleOtpChange(value, index),
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               counterText: '',
-              filled: true,
-              fillColor: const Color(0xFFFFE5D0),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
-              ),
-              contentPadding: const EdgeInsets.all(12),
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
             ),
-            style: const TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         );
       }),
@@ -132,7 +148,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       children: [
         const Text(
           "If you don’t receive the code! ",
-          style: TextStyle(fontSize: 13),
+          style: TextStyle(
+            fontSize: 13,
+            color: Color.fromARGB(255, 120, 118, 118),
+          ),
         ),
         TextButton(
           onPressed: () {
@@ -152,43 +171,48 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   }
 
   Widget _buildVerifyButton() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFFBD2D01),
-            Color(0xFFCF4602),
-            Color(0xFFF67F00),
-            Color(0xFFCF4602),
-            Color(0xFFBD2D01),
+    return SizedBox(
+      width: double.infinity,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFFBD2D01),
+              Color(0xFFCF4602),
+              Color(0xFFF67F00),
+              Color(0xFFCF4602),
+              Color(0xFFBD2D01),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
           ],
         ),
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
-        ],
-      ),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-        onPressed: () {
-          final code = _otpControllers.map((c) => c.text).join();
-          // TODO: Submit OTP code
-        },
-        child: const Text(
-          "Verify",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+          onPressed: () {
+            // Handle verification logic here
+            Navigator.pushNamed(context, '/EnterNewPassword');
+          },
+          child: const Text(
+            "Verify and Proceed",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
         ),
       ),
@@ -217,9 +241,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           _buildSubtitleText(),
           const SizedBox(height: 16),
           _buildOtpFields(),
-          const SizedBox(height: 16),
+          const SizedBox(height: 4), // reduced from 16
           _buildResendSection(),
-          const SizedBox(height: 12),
+          const SizedBox(height: 4), // reduced from 12
           _buildVerifyButton(),
         ],
       ),

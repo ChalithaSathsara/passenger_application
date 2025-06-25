@@ -46,7 +46,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         ).createShader(bounds);
       },
       child: const Text(
-        "Reset Password",
+        "Enter New Password",
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
@@ -58,9 +58,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   Widget _buildInstructionText() {
     return const Text(
-      "Set the new password for your account so you can login and access all features.",
+      "Your new password must be different from the previous used password.",
       textAlign: TextAlign.center,
-      style: TextStyle(fontSize: 13, color: Colors.black),
+      style: TextStyle(fontSize: 13, color: Color.fromARGB(255, 120, 118, 118)),
     );
   }
 
@@ -79,11 +79,16 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         hintStyle: const TextStyle(color: Color(0xFFFF6600), fontSize: 14),
         filled: true,
         fillColor: const Color(0xFFFFE5D0),
-        prefixIcon: const Icon(Icons.lock_outline, size: 20),
+        prefixIcon: const Icon(
+          Icons.lock_outline,
+          size: 20,
+          color: Color(0xFFFF6600),
+        ),
         suffixIcon: IconButton(
           icon: Icon(
             isVisible ? Icons.visibility_off : Icons.visibility,
             size: 20,
+            color: Color(0xFFFF6600),
           ),
           onPressed: onToggle,
         ),
@@ -100,44 +105,47 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 
   Widget _buildResetButton() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFFBD2D01),
-            Color(0xFFCF4602),
-            Color(0xFFF67F00),
-            Color(0xFFCF4602),
-            Color(0xFFBD2D01),
+    return SizedBox(
+      width: double.infinity, // Match input field width
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFFBD2D01),
+              Color(0xFFCF4602),
+              Color(0xFFF67F00),
+              Color(0xFFCF4602),
+              Color(0xFFBD2D01),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
           ],
         ),
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
-        ],
-      ),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-        onPressed: () {
-          // You can print for testing
-          print("New Password: ${_newPasswordController.text}");
-          print("Confirm Password: ${_confirmPasswordController.text}");
-        },
-        child: const Text(
-          "Reset Password",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+          onPressed: () {
+            // Handle password reset action here
+          },
+          child: const Text(
+            "Continue",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
         ),
       ),

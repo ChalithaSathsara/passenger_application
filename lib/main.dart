@@ -20,9 +20,12 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: 'Roboto',
       ),
-      home: const EmailVerificationScreen(),
+      home: const Logingscreen(),
       routes: {
-        '/register': (context) => const RegisterScreen(), // 👈 Named route
+        '/register': (context) => const RegisterScreen(),
+        '/forget': (context) => const ForgotPasswordScreen(),
+        '/RecoverPassword': (context) => const EmailVerificationScreen(),
+        '/EnterNewPassword': (context) => const ResetPasswordScreen(),
       },
     );
   }
