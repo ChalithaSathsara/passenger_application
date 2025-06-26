@@ -150,14 +150,14 @@ class _HomeScreenState extends State<HomeScreen> {
             "Buses",
             "assets/images/RedBus.png",
             onTap: () {
-              Navigator.pushNamed(context, '/RecoverPassword');
+              Navigator.pushNamed(context, '/suggest');
             },
           ),
           _buildImageCard(
             "Places",
             "assets/images/Places.png",
             onTap: () {
-              Navigator.pushNamed(context, '/RecoverPassword');
+              Navigator.pushNamed(context, '/suggest');
             },
           ),
         ],
@@ -334,6 +334,27 @@ class _HomeScreenState extends State<HomeScreen> {
               setState(() {
                 _selectedIndex = index;
               });
+
+              switch (index) {
+                case 0:
+                  Navigator.pushNamed(context, '/RecoverPassword');
+                  break;
+                case 1:
+                  Navigator.pushNamed(context, '/RecoverPassword');
+                  break;
+                case 2:
+                  Navigator.pushNamed(context, '/RecoverPassword');
+                  break;
+                case 3:
+                  Navigator.pushNamed(context, '/RecoverPassword');
+                  break;
+                case 4:
+                  Navigator.pushNamed(context, '/RecoverPassword');
+                  break;
+                case 5:
+                  Navigator.pushNamed(context, '/RecoverPassword');
+                  break;
+              }
             },
             child: Container(
               padding: const EdgeInsets.all(6),

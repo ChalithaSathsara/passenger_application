@@ -144,11 +144,7 @@ class _LogingscreenState extends State<Logingscreen> {
             elevation: 0,
           ),
           onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              _formKey.currentState!.save();
-              print('Email: $_email');
-              print('Password: $_password');
-            }
+            Navigator.pushNamed(context, '/home');
           },
           child: const Text(
             'Log In',
