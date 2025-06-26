@@ -60,7 +60,9 @@ flutter:
   
    - assets/images/google.png
    - assets/images/logo.png
-
+   - assets/images/RedBus.png
+   - assets/images/Places.png
+   - assets/images/GoogleMap.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

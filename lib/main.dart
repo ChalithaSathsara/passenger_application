@@ -4,6 +4,7 @@ import 'package:passenger_app/screens/register_screen.dart';
 import 'package:passenger_app/screens/forget_password_screen.dart';
 import 'package:passenger_app/screens/forget_password_email_verification_screen.dart';
 import 'package:passenger_app/screens/forget_password_enter_new_password_screen.dart';
+import 'package:passenger_app/screens/Home_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: 'Roboto',
       ),
-      home: const Logingscreen(),
+      home: const HomeScreen(),
       routes: {
         '/register': (context) => const RegisterScreen(),
         '/forget': (context) => const ForgotPasswordScreen(),
