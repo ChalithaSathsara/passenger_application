@@ -457,7 +457,9 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                     ),
                     foregroundColor: Colors.white,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/placesAroundLocation');
+                  },
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

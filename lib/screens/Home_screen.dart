@@ -176,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
             "assets/images/RedBus.png",
             showFavorite: true,
             onTap: () {
-              Navigator.pushNamed(context, '/RecoverPassword');
+              Navigator.pushNamed(context, '/favourites');
             },
           ),
           _buildImageCard(
@@ -184,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
             "assets/images/Places.png",
             showFavorite: true,
             onTap: () {
-              Navigator.pushNamed(context, '/RecoverPassword');
+              Navigator.pushNamed(context, '/favourites');
             },
           ),
         ],
@@ -293,7 +293,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (label == "Plan Trip") {
             Navigator.pushNamed(context, '/tripPlanner');
           } else if (label == "View Live Map") {
-            //Navigator.pushNamed(context, '/liveMap');
+            Navigator.pushNamed(context, '/liveMap');
           }
         },
         style: ElevatedButton.styleFrom(

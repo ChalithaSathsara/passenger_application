@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class SuggestScreen extends StatefulWidget {
-  const SuggestScreen({super.key});
+class FavouriteScreen extends StatefulWidget {
+  const FavouriteScreen({super.key});
 
   @override
-  State<SuggestScreen> createState() => _SuggestScreenState();
+  State<FavouriteScreen> createState() => _FavouriteScreenState();
 }
 
-class _SuggestScreenState extends State<SuggestScreen> {
+class _FavouriteScreenState extends State<FavouriteScreen> {
   bool showBuses = true;
   int _selectedIndex = 0;
 
@@ -63,7 +63,7 @@ class _SuggestScreenState extends State<SuggestScreen> {
           ),
           const SizedBox(width: 12),
           const Text(
-            "Suggest",
+            "Favourites",
             style: TextStyle(
               fontSize: 18,
               color: Colors.white,
@@ -173,52 +173,65 @@ class _SuggestScreenState extends State<SuggestScreen> {
       itemCount: busList.length,
       itemBuilder: (context, index) {
         final bus = busList[index];
-        final expanded = expandedIndices.contains(index);
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.25), // darker shadow
-                blurRadius: 8, // more blur
-                spreadRadius: 2, // extends further
-                offset: const Offset(0, 4), // shift down a bit
+        return Stack(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.25),
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: ExpansionTile(
-            tilePadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 4,
-            ),
-            leading: const Icon(Icons.directions_bus, color: Colors.black),
-            title: Text(
-              "No. ${bus["number"]}",
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Travel Time: ${bus["time"]}"),
-                Text("Distance: ${bus["distance"]}"),
-              ],
-            ),
-            trailing: const Icon(Icons.expand_more),
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+              child: ExpansionTile(
+                tilePadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
                 ),
-                child: Text(
-                  "More details about Bus No. ${bus["number"]} can be shown here.",
-                  style: const TextStyle(color: Colors.black54),
+                leading: const Icon(Icons.directions_bus, color: Colors.black),
+                title: Text(
+                  "No. ${bus["number"]}",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Travel Time: ${bus["time"]}"),
+                    Text("Distance: ${bus["distance"]}"),
+                  ],
+                ),
+                trailing: const Icon(Icons.expand_more),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Text(
+                      "More details about Bus No. ${bus["number"]} can be shown here.",
+                      style: const TextStyle(color: Colors.black54),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            Positioned(
+              top: -10,
+              right: -10,
+              child: IconButton(
+                icon: const Icon(Icons.favorite_border, color: Colors.red),
+                onPressed: () {
+                  // handle favorite toggle if needed
+                },
+              ),
+            ),
+          ],
         );
       },
     );
@@ -231,54 +244,66 @@ class _SuggestScreenState extends State<SuggestScreen> {
         crossAxisCount: 3,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 0.8,
+        childAspectRatio: 0.7,
       ),
       itemCount: places.length,
       itemBuilder: (context, index) {
-        return Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Image at the top
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(8),
+        return Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
                   ),
-                  child: Image.asset(places[index], fit: BoxFit.cover),
-                ),
+                ],
               ),
-              // Solid orange container under the image
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 234, 118, 10),
-                  borderRadius: const BorderRadius.vertical(
-                    bottom: Radius.circular(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(8),
+                      ),
+                      child: Image.asset(places[index], fit: BoxFit.cover),
+                    ),
                   ),
-                ),
-                alignment: Alignment.center,
-                child: const Text(
-                  "Gangarama Temple",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 234, 118, 10),
+                      borderRadius: const BorderRadius.vertical(
+                        bottom: Radius.circular(8),
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      "Gangarama Temple",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
+            ),
+            Positioned(
+              top: -10,
+              right: -10,
+              child: IconButton(
+                icon: const Icon(Icons.favorite_border, color: Colors.red),
+                onPressed: () {
+                  // handle favorite toggle if needed
+                },
+              ),
+            ),
+          ],
         );
       },
     );

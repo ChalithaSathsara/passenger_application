@@ -7,6 +7,9 @@ import 'package:passenger_app/screens/forget_password_enter_new_password_screen.
 import 'package:passenger_app/screens/Home_screen.dart';
 import 'package:passenger_app/screens/sugest_screen.dart';
 import 'package:passenger_app/screens/trip_planner_screen.dart';
+import 'package:passenger_app/screens/places_around_location.dart';
+import 'package:passenger_app/screens/live_map_scren.dart';
+import 'package:passenger_app/screens/favourite_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,6 +35,10 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomeScreen(),
         '/suggest': (context) => const SuggestScreen(),
         '/tripPlanner': (context) => const TripPlannerScreen(),
+        '/placesAroundLocation': (context) =>
+            const PlacesAroundLocationScreen(),
+        '/liveMap': (context) => const LiveMapScreen(),
+        '/favourites': (context) => const FavouriteScreen(),
       },
     );
   }
