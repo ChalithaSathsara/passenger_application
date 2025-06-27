@@ -11,11 +11,13 @@ class TripPlannerScreen extends StatefulWidget {
 class _TripPlannerScreenState extends State<TripPlannerScreen> {
   int _selectedIndex = 2;
   bool isSwapped = false;
+  bool showPanel = false; // Show bottom panel after search
+  int expandedIndex = -1; // For expanding/collapsing itinerary details
 
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(color: Color(0xFFFFA54F)),
+      decoration: const BoxDecoration(color: Color.fromARGB(255, 234, 118, 10)),
       child: Row(
         children: [
           GestureDetector(
@@ -42,11 +44,10 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center, // <<< CHANGE HERE
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Vertical icon column
+          // Vertical icons
           Column(
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               const SizedBox(height: 14),
               const Icon(
@@ -77,34 +78,20 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 SizedBox(
                   height: 44,
                   child: TextField(
+                    onSubmitted: (_) {
+                      setState(() {
+                        showPanel = true;
+                      });
+                    },
                     decoration: InputDecoration(
                       hintText: "Choose starting point",
                       hintStyle: const TextStyle(color: Colors.black54),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12,
-                        vertical: 0,
                       ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(
-                          color: Color(0xFFBD2D01),
-                          width: 1.2,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(
-                          color: Color(0xFFBD2D01),
-                          width: 1.2,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(
-                          color: Color(0xFFBD2D01), // Same color as enabled
-                          width: 1.2,
-                        ),
-                      ),
+                      border: _border(),
+                      enabledBorder: _border(),
+                      focusedBorder: _border(),
                     ),
                   ),
                 ),
@@ -112,36 +99,20 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 SizedBox(
                   height: 44,
                   child: TextField(
+                    onSubmitted: (_) {
+                      setState(() {
+                        showPanel = true;
+                      });
+                    },
                     decoration: InputDecoration(
                       hintText: "Choose destination",
                       hintStyle: const TextStyle(color: Colors.black54),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12,
-                        vertical: 0,
                       ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(
-                          color: Color(0xFFBD2D01),
-                          width: 1.2,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(
-                          color: Color(0xFFBD2D01),
-                          width: 1.2,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(
-                          color: Color(
-                            0xFFBD2D01,
-                          ), // Same color to prevent change
-                          width: 1.2,
-                        ),
-                      ),
+                      border: _border(),
+                      enabledBorder: _border(),
+                      focusedBorder: _border(),
                     ),
                   ),
                 ),
@@ -151,7 +122,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
 
           const SizedBox(width: 10),
 
-          // Swap icon centered between fields
+          // Swap icon
           GestureDetector(
             onTap: () {
               setState(() {
@@ -169,14 +140,21 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     );
   }
 
+  OutlineInputBorder _border() {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(6),
+      borderSide: const BorderSide(color: Color(0xFFBD2D01), width: 1.2),
+    );
+  }
+
   Widget _buildMapPlaceholder() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      height: 500,
+      height: 400,
       decoration: BoxDecoration(
         color: Colors.grey.shade200,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade400, width: 1.0),
+        border: Border.all(color: Colors.grey.shade400),
       ),
       child: const Center(
         child: Text(
@@ -184,6 +162,328 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
           style: TextStyle(color: Colors.black54),
         ),
       ),
+    );
+  }
+
+  Widget _buildBottomPanel() {
+    final itineraries = [
+      {
+        "bus": "No. 05",
+        "travelTime": "Around 2.5 hours",
+        "distance": "93.4km",
+        "departure": "1.15 p.m.",
+        "arrival": "3.45 p.m.",
+        "route": [
+          "Kurunegala",
+          "Polgahawela",
+          "Alawwa",
+          "Warakapola",
+          "Veyangoda",
+          "Nittambuwa",
+          "Yakkala",
+          "Kadawatha",
+          "Paliyagoda",
+          "Colombo",
+        ],
+      },
+      {
+        "bus": "No. EX4-6",
+        "travelTime": "Around 2 hours 10 min",
+        "distance": "102km",
+      },
+      {
+        "bus": "No. 34/1",
+        "travelTime": "Around 2.5 hours",
+        "distance": "112.4km",
+      },
+    ];
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      minChildSize: 0.3,
+      maxChildSize: 0.7,
+      builder: (context, controller) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: const Color.fromARGB(255, 234, 118, 10),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: const EdgeInsets.only(
+            top: 12,
+            left: 12,
+            right: 12,
+            bottom: 8,
+          ),
+          child: Column(
+            children: [
+              // Title Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Trip Itinerary",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () {
+                      setState(() {
+                        showPanel = false;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+
+              // Itinerary List with scrolling
+              Expanded(
+                child: ListView.builder(
+                  controller: controller,
+                  itemCount: itineraries.length,
+                  itemBuilder: (context, index) {
+                    final item = itineraries[index];
+                    final isExpanded = expandedIndex == index;
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Top Row
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(
+                                Icons.directions_bus,
+                                color: Colors.black,
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      (item["bus"] ?? "").toString(),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    if (!isExpanded) ...[
+                                      Text(
+                                        "Travel Time: ${item["travelTime"]}",
+                                      ),
+                                      Text("Distance: ${item["distance"]}"),
+                                    ],
+                                    if (isExpanded) ...[
+                                      Text(
+                                        "Departure Time: ${item["departure"] ?? "-"}",
+                                      ),
+                                      Text(
+                                        "Arrival Time: ${item["arrival"] ?? "-"}",
+                                      ),
+                                      Text(
+                                        "Travel Time: ${item["travelTime"]}",
+                                      ),
+                                      Text("Distance: ${item["distance"]}"),
+                                      const SizedBox(height: 4),
+                                      const Text("Route:"),
+                                      if ((item["route"] as List?) != null)
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // Timeline
+                                            Column(
+                                              children: [
+                                                const Icon(
+                                                  Icons.radio_button_checked,
+                                                  color: Colors.red,
+                                                  size: 16,
+                                                ),
+                                                Container(
+                                                  width: 2,
+                                                  height:
+                                                      ((item["route"] as List)
+                                                              .length -
+                                                          2) *
+                                                      32,
+                                                  color: Colors.red,
+                                                ),
+                                                const Icon(
+                                                  Icons.location_on,
+                                                  color: Colors.red,
+                                                  size: 16,
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(width: 6),
+                                            // Stop Names
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: List.generate(
+                                                  (item["route"] as List)
+                                                      .length,
+                                                  (i) => Padding(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          vertical: 6,
+                                                        ),
+                                                    child: Text(
+                                                      (item["route"]
+                                                          as List)[i],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      Align(
+                                        alignment: Alignment.bottomRight,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 4,
+                                          ),
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  const Color.fromARGB(
+                                                    255,
+                                                    234,
+                                                    118,
+                                                    10,
+                                                  ),
+                                              elevation: 4,
+                                              shadowColor: Colors.black
+                                                  .withOpacity(0.6),
+                                              shape:
+                                                  const StadiumBorder(), // <-- Makes it fully rounded
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 24,
+                                                    vertical: 12,
+                                                  ),
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                showPanel = false;
+                                              });
+                                            },
+                                            child: const Text(
+                                              "View Map",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.favorite_border,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () {
+                                  // Add to favorite logic
+                                },
+                              ),
+                            ],
+                          ),
+                          // Expand/Collapse Button
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: IconButton(
+                              icon: Icon(
+                                isExpanded
+                                    ? Icons.expand_less
+                                    : Icons.expand_more,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  expandedIndex = isExpanded ? -1 : index;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              // Bottom Button
+              Container(
+                width: double.infinity,
+                height: 42,
+                margin: const EdgeInsets.only(top: 8),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 189, 33, 16),
+                  borderRadius: BorderRadius.circular(6),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.5),
+                      offset: const Offset(0, 3),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {},
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 8),
+                        child: Text(
+                          "Places Around Colombo",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(right: 8),
+                        child: Icon(Icons.arrow_forward, color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // <<< ADD THESE FINAL CLOSINGS >>>
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -216,22 +516,22 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
 
               switch (index) {
                 case 0:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  // Navigator.pushNamed(context, '/RecoverPassword');
                   break;
                 case 1:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  //  Navigator.pushNamed(context, '/RecoverPassword');
                   break;
                 case 2:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  //  Navigator.pushNamed(context, '/RecoverPassword');
                   break;
                 case 3:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  //  Navigator.pushNamed(context, '/RecoverPassword');
                   break;
                 case 4:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  // Navigator.pushNamed(context, '/RecoverPassword');
                   break;
                 case 5:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  //  Navigator.pushNamed(context, '/RecoverPassword');
                   break;
               }
             },
@@ -277,18 +577,27 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              _buildInputFields(),
-              _buildMapPlaceholder(),
-            ],
+      body: Stack(
+        children: [
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(),
+                  _buildInputFields(),
+                  _buildMapPlaceholder(),
+                  const SizedBox(height: 80),
+                ],
+              ),
+            ),
           ),
-        ),
+          if (showPanel)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: _buildBottomPanel(),
+            ),
+        ],
       ),
       bottomNavigationBar: _buildBottomNavBar(),
     );

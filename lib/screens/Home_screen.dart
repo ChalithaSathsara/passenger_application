@@ -289,7 +289,13 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          if (label == "Plan Trip") {
+            Navigator.pushNamed(context, '/tripPlanner');
+          } else if (label == "View Live Map") {
+            //Navigator.pushNamed(context, '/liveMap');
+          }
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
@@ -299,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Text(
           label,
           style: const TextStyle(
-            color: Colors.black, // Changed from white to black
+            color: Colors.black,
             fontWeight: FontWeight.bold,
             fontSize: 14,
           ),

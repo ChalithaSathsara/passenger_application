@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: 'Roboto',
       ),
-      home: const TripPlannerScreen(),
+      home: const Logingscreen(),
       routes: {
         '/register': (context) => const RegisterScreen(),
         '/forget': (context) => const ForgotPasswordScreen(),
@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
         '/EnterNewPassword': (context) => const ResetPasswordScreen(),
         '/home': (context) => const HomeScreen(),
         '/suggest': (context) => const SuggestScreen(),
+        '/tripPlanner': (context) => const TripPlannerScreen(),
       },
     );
   }
