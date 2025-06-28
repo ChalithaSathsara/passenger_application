@@ -231,7 +231,7 @@ class _SuggestScreenState extends State<SuggestScreen> {
         crossAxisCount: 3,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 0.8,
+        childAspectRatio: 0.7,
       ),
       itemCount: places.length,
       itemBuilder: (context, index) {
@@ -274,6 +274,7 @@ class _SuggestScreenState extends State<SuggestScreen> {
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
+                    fontSize: 12,
                   ),
                 ),
               ),
@@ -313,22 +314,22 @@ class _SuggestScreenState extends State<SuggestScreen> {
 
               switch (index) {
                 case 0:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/home');
                   break;
                 case 1:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/tripPlanner');
                   break;
                 case 2:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/liveMap');
                   break;
                 case 3:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/favourites');
                   break;
                 case 4:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/notifications');
                   break;
                 case 5:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/RecoverPassword');
                   break;
               }
             },

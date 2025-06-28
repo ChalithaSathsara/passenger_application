@@ -343,22 +343,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
               switch (index) {
                 case 0:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/home');
                   break;
                 case 1:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/tripPlanner');
                   break;
                 case 2:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/liveMap');
                   break;
                 case 3:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/favourites');
                   break;
                 case 4:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/notifications');
                   break;
                 case 5:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/RecoverPassword');
                   break;
               }
             },

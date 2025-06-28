@@ -9,7 +9,7 @@ class FavouriteScreen extends StatefulWidget {
 
 class _FavouriteScreenState extends State<FavouriteScreen> {
   bool showBuses = true;
-  int _selectedIndex = 0;
+  int _selectedIndex = 3;
 
   // Sample dynamic data
   final List<Map<String, String>> busList = [
@@ -287,6 +287,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
+                        fontSize: 12,
                       ),
                     ),
                   ),
@@ -338,22 +339,22 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
 
               switch (index) {
                 case 0:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/home');
                   break;
                 case 1:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/tripPlanner');
                   break;
                 case 2:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/liveMap');
                   break;
                 case 3:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/favourites');
                   break;
                 case 4:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/notifications');
                   break;
                 case 5:
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/RecoverPassword');
                   break;
               }
             },
