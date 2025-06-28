@@ -354,7 +354,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                   Navigator.pushReplacementNamed(context, '/notifications');
                   break;
                 case 5:
-                  Navigator.pushReplacementNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/more');
                   break;
               }
             },

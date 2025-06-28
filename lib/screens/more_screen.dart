@@ -10,7 +10,7 @@ class MoreScreen extends StatefulWidget {
 class _MoreScreenState extends State<MoreScreen> {
   String userName = "John Rubic";
   String? profileImageUrl;
-  int _selectedIndex = 0;
+  int _selectedIndex = 5;
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +83,7 @@ class _MoreScreenState extends State<MoreScreen> {
             icon: Icons.person,
             text: "Profile",
             onTap: () {
-              Navigator.pushNamed(context, "/profile");
+              Navigator.pushNamed(context, '/profile');
             },
           ),
           const SizedBox(height: 20),
@@ -91,7 +91,7 @@ class _MoreScreenState extends State<MoreScreen> {
             icon: Icons.feedback,
             text: "Feedback",
             onTap: () {
-              Navigator.pushNamed(context, "/feedback");
+              Navigator.pushNamed(context, '/feedback');
             },
           ),
           const SizedBox(height: 20),
@@ -99,7 +99,7 @@ class _MoreScreenState extends State<MoreScreen> {
             icon: Icons.support,
             text: "Help & Support",
             onTap: () {
-              Navigator.pushNamed(context, "/support");
+              Navigator.pushNamed(context, '/helpAndSupport');
             },
           ),
           const SizedBox(height: 20),
@@ -107,7 +107,7 @@ class _MoreScreenState extends State<MoreScreen> {
             icon: Icons.info,
             text: "About Us",
             onTap: () {
-              Navigator.pushNamed(context, "/about");
+              Navigator.pushNamed(context, '/aboutUs');
             },
           ),
           const SizedBox(height: 20),
@@ -119,7 +119,7 @@ class _MoreScreenState extends State<MoreScreen> {
             ),
             text: "Log Out",
             onTap: () {
-              Navigator.pushNamed(context, "/logout");
+              Navigator.pushNamed(context, "/login");
             },
             showArrow: false,
           ),
@@ -224,7 +224,7 @@ class _MoreScreenState extends State<MoreScreen> {
                   Navigator.pushReplacementNamed(context, '/notifications');
                   break;
                 case 5:
-                  Navigator.pushReplacementNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/more');
                   break;
               }
             },

@@ -13,6 +13,9 @@ import 'package:passenger_app/screens/favourite_screen.dart';
 import 'package:passenger_app/screens/notification_screen.dart';
 import 'package:passenger_app/screens/more_screen.dart';
 import 'package:passenger_app/screens/profile_screen.dart';
+import 'package:passenger_app/screens/feedback_screen.dart';
+import 'package:passenger_app/screens/help_and_support_screen.dart';
+import 'package:passenger_app/screens/about_us_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,7 +32,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: 'Roboto',
       ),
-      home: const ProfileScreen(),
+      home: const Logingscreen(),
       routes: {
         '/register': (context) => const RegisterScreen(),
         '/forget': (context) => const ForgotPasswordScreen(),
@@ -44,6 +47,11 @@ class MyApp extends StatelessWidget {
         '/favourites': (context) => const FavouriteScreen(),
         '/notifications': (context) => const NotificationsScreen(),
         '/more': (context) => const MoreScreen(),
+        '/profile': (context) => const ProfileScreen(),
+        '/feedback': (context) => const FeedbackScreen(),
+        '/helpAndSupport': (context) => const HelpAndSupport(),
+        '/aboutUs': (context) => const AboutUsScreen(),
+        '/login': (context) => const Logingscreen(),
       },
     );
   }

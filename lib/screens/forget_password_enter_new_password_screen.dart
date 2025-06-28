@@ -137,6 +137,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             ),
           ),
           onPressed: () {
+            Navigator.pushNamed(context, "/login");
             // Handle password reset action here
           },
           child: const Text(

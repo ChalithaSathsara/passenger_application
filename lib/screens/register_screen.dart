@@ -62,6 +62,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Image.asset(
       'assets/images/logo.png', // Your combined logo+text image
       width: 200,
+      height: 130,
       fit: BoxFit.contain,
     );
   }
@@ -278,6 +279,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
       child: TextButton(
         onPressed: () {
+          Navigator.pushNamed(context, "/login");
           _formKey.currentState?.save();
         },
         child: const Text(

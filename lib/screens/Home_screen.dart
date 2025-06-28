@@ -358,7 +358,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.pushReplacementNamed(context, '/notifications');
                   break;
                 case 5:
-                  Navigator.pushReplacementNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/more');
                   break;
               }
             },

@@ -329,7 +329,7 @@ class _SuggestScreenState extends State<SuggestScreen> {
                   Navigator.pushReplacementNamed(context, '/notifications');
                   break;
                 case 5:
-                  Navigator.pushReplacementNamed(context, '/RecoverPassword');
+                  Navigator.pushReplacementNamed(context, '/more');
                   break;
               }
             },
