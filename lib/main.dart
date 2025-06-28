@@ -11,6 +11,8 @@ import 'package:passenger_app/screens/places_around_location.dart';
 import 'package:passenger_app/screens/live_map_scren.dart';
 import 'package:passenger_app/screens/favourite_screen.dart';
 import 'package:passenger_app/screens/notification_screen.dart';
+import 'package:passenger_app/screens/more_screen.dart';
+import 'package:passenger_app/screens/profile_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: 'Roboto',
       ),
-      home: const HomeScreen(),
+      home: const ProfileScreen(),
       routes: {
         '/register': (context) => const RegisterScreen(),
         '/forget': (context) => const ForgotPasswordScreen(),
@@ -41,6 +43,7 @@ class MyApp extends StatelessWidget {
         '/liveMap': (context) => const LiveMapScreen(),
         '/favourites': (context) => const FavouriteScreen(),
         '/notifications': (context) => const NotificationsScreen(),
+        '/more': (context) => const MoreScreen(),
       },
     );
   }
