@@ -11,18 +11,30 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
 
   Widget _buildAppBar() {
-    return Row(
-      children: const [
-        BackButton(color: Colors.white),
-        Text(
-          "Forgot Password",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+      decoration: const BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.black, // Black line
+            width: 0.6,
           ),
         ),
-      ],
+      ),
+      child: Row(
+        children: const [
+          BackButton(color: Colors.white),
+          SizedBox(width: 8),
+          Text(
+            "Forgot Password",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -88,12 +100,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            Color(0xFFBD2D01),
-            Color(0xFFCF4602),
-            Color(0xFFF67F00),
-            Color(0xFFCF4602),
-            Color(0xFFBD2D01),
+            Color.fromARGB(255, 230, 119, 29),
+            Color.fromARGB(255, 227, 121, 34),
+            Color.fromARGB(255, 214, 113, 30),
+            Color.fromARGB(255, 211, 95, 12),
+            Color.fromARGB(255, 203, 51, 5),
           ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
@@ -177,10 +191,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           child: Column(
             children: [
               const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _buildAppBar(),
-              ),
+              _buildAppBar(), // Removed extra Padding
               const SizedBox(height: 60),
               _buildFormCard(),
             ],

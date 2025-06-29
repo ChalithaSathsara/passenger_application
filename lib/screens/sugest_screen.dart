@@ -30,6 +30,17 @@ class _SuggestScreenState extends State<SuggestScreen> {
   Set<int> expandedIndices = {};
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final arg = ModalRoute.of(context)!.settings.arguments;
+    if (arg != null && arg is bool) {
+      setState(() {
+        showBuses = arg;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -50,7 +61,7 @@ class _SuggestScreenState extends State<SuggestScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: const BoxDecoration(
-        color: Color(0xFFFFA54F),
+        color: Color.fromARGB(255, 247, 155, 51),
         // Removed borderRadius to make it flat
       ),
       child: Row(
@@ -94,12 +105,14 @@ class _SuggestScreenState extends State<SuggestScreen> {
                   gradient: showBuses
                       ? const LinearGradient(
                           colors: [
-                            Color(0xFFBD2D01),
-                            Color(0xFFCF4602),
-                            Color(0xFFF67F00),
-                            Color(0xFFCF4602),
-                            Color(0xFFBD2D01),
+                            Color.fromARGB(255, 230, 119, 29),
+                            Color.fromARGB(255, 227, 121, 34),
+                            Color.fromARGB(255, 214, 113, 30),
+                            Color.fromARGB(255, 211, 95, 12),
+                            Color.fromARGB(255, 203, 51, 5),
                           ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
                         )
                       : null,
                   borderRadius: BorderRadius.circular(20),
@@ -136,12 +149,14 @@ class _SuggestScreenState extends State<SuggestScreen> {
                   gradient: !showBuses
                       ? const LinearGradient(
                           colors: [
-                            Color(0xFFBD2D01),
-                            Color(0xFFCF4602),
-                            Color(0xFFF67F00),
-                            Color(0xFFCF4602),
-                            Color(0xFFBD2D01),
+                            Color.fromARGB(255, 230, 119, 29),
+                            Color.fromARGB(255, 227, 121, 34),
+                            Color.fromARGB(255, 214, 113, 30),
+                            Color.fromARGB(255, 211, 95, 12),
+                            Color.fromARGB(255, 203, 51, 5),
                           ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
                         )
                       : null,
                   borderRadius: BorderRadius.circular(20),

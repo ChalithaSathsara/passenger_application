@@ -32,10 +32,20 @@ class _MoreScreenState extends State<MoreScreen> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 24),
-      color: const Color(0xFFFFA54F), // Flat bottom, no radius
+      color: Color.fromARGB(255, 247, 155, 51),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/home');
+                },
+              ),
+            ],
+          ),
           CircleAvatar(
             radius: 35,
             backgroundColor: const Color.fromARGB(255, 5, 5, 5),

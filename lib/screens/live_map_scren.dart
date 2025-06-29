@@ -15,12 +15,12 @@ class _LiveMapScreenState extends State<LiveMapScreen> {
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(color: Color.fromARGB(255, 234, 118, 10)),
+      decoration: const BoxDecoration(color: Color.fromARGB(255, 247, 155, 51)),
       child: Row(
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/home');
             },
             child: const Icon(Icons.arrow_back, color: Colors.white),
           ),

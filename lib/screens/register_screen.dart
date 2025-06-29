@@ -69,7 +69,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget _buildFormCard() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 45),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -250,7 +250,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           suffixIcon: IconButton(
             icon: Icon(
               isVisible ? Icons.visibility_off : Icons.visibility,
-              color: const Color(0xFFCF4602),
+              color: Color.fromARGB(255, 194, 44, 14),
             ),
             onPressed: onVisibilityToggle,
           ),
@@ -266,11 +266,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            Color(0xFFBD2D01),
-            Color(0xFFCF4602),
-            Color(0xFFCF4602),
-            Color(0xFFCF4602),
-            Color(0xFFBD2D01),
+            Color.fromARGB(255, 230, 119, 29),
+            Color.fromARGB(255, 227, 121, 34),
+            Color.fromARGB(255, 214, 113, 30),
+            Color.fromARGB(255, 211, 95, 12),
+            Color.fromARGB(255, 203, 51, 5),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -284,7 +284,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         },
         child: const Text(
           'Register',
-          style: TextStyle(color: Colors.white, fontSize: 16),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );

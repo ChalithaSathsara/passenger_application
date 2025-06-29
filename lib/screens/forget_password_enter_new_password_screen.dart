@@ -15,18 +15,27 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   bool _isConfirmPasswordVisible = false;
 
   Widget _buildAppBar() {
-    return Row(
-      children: const [
-        BackButton(color: Colors.white),
-        Text(
-          "Reset Password",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+    return Container(
+      width: double.infinity, // make sure it spans the whole width
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.black, width: 0.6)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: const [
+          BackButton(color: Colors.white),
+          SizedBox(width: 8),
+          Text(
+            "Reset Password",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -111,12 +120,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [
-              Color(0xFFBD2D01),
-              Color(0xFFCF4602),
-              Color(0xFFF67F00),
-              Color(0xFFCF4602),
-              Color(0xFFBD2D01),
+              Color.fromARGB(255, 230, 119, 29),
+              Color.fromARGB(255, 227, 121, 34),
+              Color.fromARGB(255, 214, 113, 30),
+              Color.fromARGB(255, 211, 95, 12),
+              Color.fromARGB(255, 203, 51, 5),
             ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
@@ -223,10 +234,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           child: Column(
             children: [
               const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _buildAppBar(),
-              ),
+              _buildAppBar(), // <-- no padding here
               const SizedBox(height: 60),
               _buildFormCard(),
             ],

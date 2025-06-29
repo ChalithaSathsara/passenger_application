@@ -191,12 +191,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Color(0xFFBD2D01),
-                        Color(0xFFCF4602),
-                        Color(0xFFF67F00),
-                        Color(0xFFCF4602),
-                        Color(0xFFBD2D01),
+                        Color.fromARGB(255, 230, 119, 29),
+                        Color.fromARGB(255, 227, 121, 34),
+                        Color.fromARGB(255, 214, 113, 30),
+                        Color.fromARGB(255, 211, 95, 12),
+                        Color.fromARGB(255, 203, 51, 5),
                       ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
                     ),
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),

@@ -31,7 +31,11 @@ class _LogingscreenState extends State<Logingscreen> {
           color: Color(0xFFFF6600),
           fontSize: 14, // standard hint size
         ),
-        prefixIcon: const Icon(Icons.person_outline, size: 20),
+        prefixIcon: const Icon(
+          Icons.person_outline,
+          size: 20,
+          color: Color.fromARGB(255, 194, 44, 14),
+        ),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 10,
           horizontal: 12,
@@ -56,11 +60,16 @@ class _LogingscreenState extends State<Logingscreen> {
       decoration: InputDecoration(
         hintText: 'Password',
         hintStyle: const TextStyle(color: Color(0xFFFF6600), fontSize: 14),
-        prefixIcon: const Icon(Icons.lock_outline, size: 20),
+        prefixIcon: const Icon(
+          Icons.lock_outline,
+          size: 20,
+          color: Color.fromARGB(255, 194, 44, 14),
+        ),
         suffixIcon: IconButton(
           icon: Icon(
             _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
             size: 20,
+            color: const Color.fromARGB(255, 194, 44, 14), // icon color
           ),
           onPressed: () {
             setState(() {
@@ -109,14 +118,14 @@ class _LogingscreenState extends State<Logingscreen> {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            Color(0xFFBD2D01),
-            Color(0xFFCF4602),
-            Color(0xFFCF4602),
-            Color(0xFFCF4602),
-            Color(0xFFBD2D01),
+            Color.fromARGB(255, 230, 119, 29),
+            Color.fromARGB(255, 227, 121, 34),
+            Color.fromARGB(255, 214, 113, 30),
+            Color.fromARGB(255, 211, 95, 12),
+            Color.fromARGB(255, 203, 51, 5),
           ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
           stops: [0.0, 0.25, 0.5, 0.75, 1.0],
         ),
         boxShadow: [
@@ -271,6 +280,7 @@ class _LogingscreenState extends State<Logingscreen> {
                   const SizedBox(height: 20), // top spacing
                   _buildLogo(),
                   const SizedBox(height: 15), // spacing after logo
+
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 30),
                     decoration: BoxDecoration(
@@ -341,7 +351,7 @@ class _LogingscreenState extends State<Logingscreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20), // bottom spacing
+                  const SizedBox(height: 60), // bottom spacing
                 ],
               ),
             ),

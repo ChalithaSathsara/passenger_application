@@ -17,12 +17,12 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(color: Color.fromARGB(255, 234, 118, 10)),
+      decoration: const BoxDecoration(color: Color.fromARGB(255, 247, 155, 51)),
       child: Row(
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/home');
             },
             child: const Icon(Icons.arrow_back, color: Colors.white),
           ),
@@ -205,7 +205,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
       builder: (context, controller) {
         return Container(
           decoration: const BoxDecoration(
-            color: const Color.fromARGB(255, 234, 118, 10),
+            color: Color.fromARGB(255, 247, 155, 51), // Updated color
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           padding: const EdgeInsets.only(
@@ -217,27 +217,33 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
           child: Column(
             children: [
               // Title Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Stack(
+                alignment: Alignment.center,
                 children: [
-                  const Text(
-                    "Trip Itinerary",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  Center(
+                    child: Text(
+                      "Trip Itinerary",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () {
-                      setState(() {
-                        showPanel = false;
-                      });
-                    },
+                  Positioned(
+                    right: 0,
+                    child: IconButton(
+                      icon: Icon(Icons.close, color: Colors.white),
+                      onPressed: () {
+                        setState(() {
+                          showPanel = false;
+                        });
+                      },
+                    ),
                   ),
                 ],
               ),
+
               const SizedBox(height: 8),
 
               // Itinerary List with scrolling
@@ -468,14 +474,17 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                         child: Text(
                           "Places Around Colombo",
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Color.fromARGB(255, 0, 0, 0),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
                       Padding(
                         padding: EdgeInsets.only(right: 8),
-                        child: Icon(Icons.arrow_forward, color: Colors.white),
+                        child: Icon(
+                          Icons.arrow_forward,
+                          color: Color.fromARGB(255, 8, 8, 8),
+                        ),
                       ),
                     ],
                   ),

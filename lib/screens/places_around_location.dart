@@ -37,7 +37,7 @@ class _PlacesAroundLocationScreenState
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: const Color.fromARGB(255, 234, 118, 10),
+      color: Color.fromARGB(255, 247, 155, 51),
       child: Row(
         children: [
           GestureDetector(

@@ -14,7 +14,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: const BoxDecoration(
-        color: Color(0xFFFFA54F),
+        color: Color.fromARGB(255, 247, 155, 51),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(30),
           bottomRight: Radius.circular(30),
@@ -35,7 +35,10 @@ class _HomeScreenState extends State<HomeScreen> {
           CircleAvatar(
             radius: 18,
             backgroundColor: Colors.white,
-            child: Icon(Icons.person, color: Colors.orange.shade600),
+            child: Icon(
+              Icons.person,
+              color: const Color.fromARGB(255, 0, 0, 0),
+            ),
           ),
         ],
       ),
@@ -97,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
         margin: const EdgeInsets.only(right: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFA54F),
+          color: Color.fromARGB(255, 247, 155, 51),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -150,14 +153,22 @@ class _HomeScreenState extends State<HomeScreen> {
             "Buses",
             "assets/images/RedBus.png",
             onTap: () {
-              Navigator.pushNamed(context, '/suggest');
+              Navigator.pushNamed(
+                context,
+                '/suggest',
+                arguments: true, // showBuses: true
+              );
             },
           ),
           _buildImageCard(
             "Places",
             "assets/images/Places.png",
             onTap: () {
-              Navigator.pushNamed(context, '/suggest');
+              Navigator.pushNamed(
+                context,
+                '/suggest',
+                arguments: false, // showBuses: false
+              );
             },
           ),
         ],
@@ -176,7 +187,11 @@ class _HomeScreenState extends State<HomeScreen> {
             "assets/images/RedBus.png",
             showFavorite: true,
             onTap: () {
-              Navigator.pushNamed(context, '/favourites');
+              Navigator.pushNamed(
+                context,
+                '/favourites',
+                arguments: true,
+              ); // showBuses: true
             },
           ),
           _buildImageCard(
@@ -184,7 +199,11 @@ class _HomeScreenState extends State<HomeScreen> {
             "assets/images/Places.png",
             showFavorite: true,
             onTap: () {
-              Navigator.pushNamed(context, '/favourites');
+              Navigator.pushNamed(
+                context,
+                '/favourites',
+                arguments: false,
+              ); // showBuses: false
             },
           ),
         ],
@@ -277,15 +296,7 @@ class _HomeScreenState extends State<HomeScreen> {
       width: 180,
       height: 38,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFFBD2D01),
-            Color(0xFFCF4602),
-            Color(0xFFF67F00),
-            Color(0xFFCF4602),
-            Color(0xFFBD2D01),
-          ],
-        ),
+        color: const Color.fromARGB(255, 241, 138, 20),
         borderRadius: BorderRadius.circular(8),
       ),
       child: ElevatedButton(
@@ -307,7 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
           style: const TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
-            fontSize: 14,
+            fontSize: 16,
           ),
         ),
       ),
@@ -403,7 +414,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFA54F),
+      backgroundColor: const Color.fromARGB(255, 247, 155, 51),
       body: SafeArea(
         child: Column(
           children: [

@@ -11,6 +11,17 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
   bool showBuses = true;
   int _selectedIndex = 3;
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args is bool) {
+      setState(() {
+        showBuses = args;
+      });
+    }
+  }
+
   // Sample dynamic data
   final List<Map<String, String>> busList = [
     {"number": "05", "time": "Around 2.5 hours", "distance": "93.4km"},
@@ -50,14 +61,14 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: const BoxDecoration(
-        color: Color(0xFFFFA54F),
+        color: Color.fromARGB(255, 247, 155, 51),
         // Removed borderRadius to make it flat
       ),
       child: Row(
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/home');
             },
             child: const Icon(Icons.arrow_back, color: Colors.white),
           ),
@@ -94,12 +105,14 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                   gradient: showBuses
                       ? const LinearGradient(
                           colors: [
-                            Color(0xFFBD2D01),
-                            Color(0xFFCF4602),
-                            Color(0xFFF67F00),
-                            Color(0xFFCF4602),
-                            Color(0xFFBD2D01),
+                            Color.fromARGB(255, 230, 119, 29),
+                            Color.fromARGB(255, 227, 121, 34),
+                            Color.fromARGB(255, 214, 113, 30),
+                            Color.fromARGB(255, 211, 95, 12),
+                            Color.fromARGB(255, 203, 51, 5),
                           ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
                         )
                       : null,
                   borderRadius: BorderRadius.circular(20),
@@ -136,12 +149,14 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                   gradient: !showBuses
                       ? const LinearGradient(
                           colors: [
-                            Color(0xFFBD2D01),
-                            Color(0xFFCF4602),
-                            Color(0xFFF67F00),
-                            Color(0xFFCF4602),
-                            Color(0xFFBD2D01),
+                            Color.fromARGB(255, 230, 119, 29),
+                            Color.fromARGB(255, 227, 121, 34),
+                            Color.fromARGB(255, 214, 113, 30),
+                            Color.fromARGB(255, 211, 95, 12),
+                            Color.fromARGB(255, 203, 51, 5),
                           ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
                         )
                       : null,
                   borderRadius: BorderRadius.circular(20),
@@ -206,7 +221,13 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                     Text("Distance: ${bus["distance"]}"),
                   ],
                 ),
-                trailing: const Icon(Icons.expand_more),
+                trailing: Transform.translate(
+                  offset: const Offset(
+                    9,
+                    30,
+                  ), // Moves 5 pixels right and 5 pixels up
+                  child: const Icon(Icons.expand_more),
+                ),
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(

@@ -65,14 +65,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: const BoxDecoration(
-        color: Color(0xFFFFA54F),
+        color: Color.fromARGB(255, 247, 155, 51),
         // Removed borderRadius
       ),
       child: Row(
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/home');
             },
             child: const Icon(Icons.arrow_back, color: Colors.white),
           ),
@@ -97,7 +97,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFA54F),
+        color: Color.fromARGB(255, 247, 155, 51),
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(

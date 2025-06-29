@@ -39,9 +39,14 @@ class AboutUsScreen extends StatelessWidget {
                           height: 120,
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          "version 0.0.1",
-                          style: TextStyle(color: Colors.white, fontSize: 14),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: 15,
+                          ), // adjust the value as needed
+                          child: Text(
+                            "version 0.0.1",
+                            style: TextStyle(color: Colors.white, fontSize: 14),
+                          ),
                         ),
                       ],
                     ),
