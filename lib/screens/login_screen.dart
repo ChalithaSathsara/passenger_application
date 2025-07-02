@@ -265,7 +265,7 @@ class _LogingscreenState extends State<Logingscreen> {
     );
 
     if (response.statusCode == 200) {
-      // If the server returns a 200 OK response, parse the JSON.
+      // If the server returns a 200 OK response, parse the JSON file.
       print('Login successful: ${response.body}');
       Navigator.pushNamed(context, '/home');
     } else {
