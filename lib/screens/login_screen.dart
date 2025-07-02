@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Logingscreen extends StatefulWidget {
   const Logingscreen({super.key});
@@ -153,7 +155,8 @@ class _LogingscreenState extends State<Logingscreen> {
             elevation: 0,
           ),
           onPressed: () {
-            Navigator.pushNamed(context, '/home');
+            _formKey.currentState?.save(); // Save the form data
+            _login(); // Call the login method
           },
           child: const Text(
             'Log In',
@@ -247,6 +250,28 @@ class _LogingscreenState extends State<Logingscreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _login() async {
+    final response = await http.post(
+      Uri.parse('https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/passenger/login'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'Email': _email,
+        'Password': _password,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, parse the JSON.
+      print('Login successful: ${response.body}');
+      Navigator.pushNamed(context, '/home');
+    } else {
+      // If the server did not return a 200 OK response, throw an exception.
+      print('Login failed: ${response.body}');
+    }
   }
 
   @override
