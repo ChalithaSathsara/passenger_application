@@ -10,39 +10,12 @@ class EmailVerificationScreen extends StatefulWidget {
 }
 
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
-  final List<TextEditingController> _otpControllers = List.generate(
-    4,
-    (_) => TextEditingController(),
-  );
-  final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
+  final TextEditingController _otpController = TextEditingController();
 
   @override
   void dispose() {
-    for (final controller in _otpControllers) {
-      controller.dispose();
-    }
-    for (final node in _focusNodes) {
-      node.dispose();
-    }
+    _otpController.dispose();
     super.dispose();
-  }
-
-  void _handleOtpChange(String value, int index) {
-    if (value.length > 1 &&
-        value.length == 4 &&
-        RegExp(r'^\d{4}$').hasMatch(value)) {
-      for (int i = 0; i < 4; i++) {
-        _otpControllers[i].text = value[i];
-      }
-      FocusScope.of(context).unfocus();
-      return;
-    }
-
-    if (value.isNotEmpty && index < 3) {
-      FocusScope.of(context).requestFocus(_focusNodes[index + 1]);
-    } else if (value.isEmpty && index > 0) {
-      FocusScope.of(context).requestFocus(_focusNodes[index - 1]);
-    }
   }
 
   Widget _buildAppBar() {
@@ -104,50 +77,40 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     );
   }
 
-  Widget _buildOtpFields() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(4, (index) {
-        return Container(
-          width: 50,
-          height: 60,
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFE5D0),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: const Color.fromARGB(
-                255,
-                246,
-                182,
-                139,
-              ), // low orange border
-              width: 1, // subtle
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
-            ],
+  Widget _buildOtpField() {
+    return Container(
+      width: 250, // 4 x 50 + spacing approximation
+      height: 50,
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFE5D0),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color.fromARGB(255, 246, 182, 139), // low orange border
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
           ),
-          child: TextField(
-            controller: _otpControllers[index],
-            focusNode: _focusNodes[index],
-            textAlign: TextAlign.center,
-            keyboardType: TextInputType.number,
-            maxLength: 1,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            onChanged: (value) => _handleOtpChange(value, index),
-            decoration: const InputDecoration(
-              counterText: '',
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
-            ),
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        );
-      }),
+        ],
+      ),
+      child: TextField(
+        controller: _otpController,
+        keyboardType: TextInputType.text,
+        maxLength: 4,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+        ],
+        textAlign: TextAlign.center,
+        decoration: const InputDecoration(
+          counterText: '',
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+        ),
+        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
     );
   }
 
@@ -251,7 +214,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           const SizedBox(height: 8),
           _buildSubtitleText(),
           const SizedBox(height: 16),
-          _buildOtpFields(),
+          _buildOtpField(),
           const SizedBox(height: 4), // reduced from 16
           _buildResendSection(),
           const SizedBox(height: 4), // reduced from 12
