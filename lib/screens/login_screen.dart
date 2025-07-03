@@ -15,6 +15,8 @@ class _LogingscreenState extends State<Logingscreen> {
   String _email = '';
   String _password = '';
   bool _isPasswordVisible = false;
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
 
   Widget _buildLogo() {
     return Image.asset(
@@ -26,6 +28,8 @@ class _LogingscreenState extends State<Logingscreen> {
 
   Widget _buildEmailField() {
     return TextFormField(
+      focusNode: _emailFocus,
+      textInputAction: TextInputAction.next,
       style: const TextStyle(fontSize: 16), // input text size
       decoration: InputDecoration(
         hintText: 'Email or username',
@@ -57,6 +61,7 @@ class _LogingscreenState extends State<Logingscreen> {
 
   Widget _buildPasswordField() {
     return TextFormField(
+      focusNode: _passwordFocus,
       style: const TextStyle(fontSize: 16),
       obscureText: !_isPasswordVisible,
       decoration: InputDecoration(
@@ -94,6 +99,13 @@ class _LogingscreenState extends State<Logingscreen> {
         _password = value!;
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
+    super.dispose();
   }
 
   Widget _buildForgotPassword() {
@@ -254,7 +266,9 @@ class _LogingscreenState extends State<Logingscreen> {
 
   Future<void> _login() async {
     final response = await http.post(
-      Uri.parse('https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/passenger/login'),
+      Uri.parse(
+        'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/passenger/login',
+      ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -265,12 +279,42 @@ class _LogingscreenState extends State<Logingscreen> {
     );
 
     if (response.statusCode == 200) {
-      // If the server returns a 200 OK response, parse the JSON file.
-      print('Login successful: ${response.body}');
       Navigator.pushNamed(context, '/home');
     } else {
-      // If the server did not return a 200 OK response, throw an exception.
-      print('Login failed: ${response.body}');
+      String errorMsg = 'Login failed. Please try again.';
+      try {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        print('API Error: ${body['error']}');
+        print('API Message: ${body['message']}');
+        print('API Response: ${response.body}');
+        print('API URL: ${response.request?.url}');
+
+        if (body['error'] == 'INVALID_LOGIN_CREDENTIALS') {
+          errorMsg = 'Invalid username or password.';
+        } else if (body['error'] == 'INVALID_EMAIL') {
+          errorMsg = 'Invalid email format.';
+        } else if (body['error'] == 'MISSING_PASSWORD') {
+          errorMsg = 'Please enter your password.';
+        } else if (body['message'] != null) {
+          errorMsg = body['message'];
+        }
+      } catch (e) {
+        print('Error parsing response: $e');
+      }
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Login Failed'),
+          content: Text(errorMsg),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
     }
   }
 
