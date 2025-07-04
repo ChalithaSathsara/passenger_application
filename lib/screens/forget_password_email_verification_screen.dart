@@ -99,7 +99,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       child: TextField(
         controller: _otpController,
         keyboardType: TextInputType.text,
-        maxLength: 4,
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
         ],

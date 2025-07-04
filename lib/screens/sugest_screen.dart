@@ -189,51 +189,81 @@ class _SuggestScreenState extends State<SuggestScreen> {
       itemBuilder: (context, index) {
         final bus = busList[index];
         final expanded = expandedIndices.contains(index);
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.25), // darker shadow
-                blurRadius: 8, // more blur
-                spreadRadius: 2, // extends further
-                offset: const Offset(0, 4), // shift down a bit
+
+        return Stack(
+          children: [
+            // Main card
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.25),
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: ExpansionTile(
-            tilePadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 4,
-            ),
-            leading: const Icon(Icons.directions_bus, color: Colors.black),
-            title: Text(
-              "No. ${bus["number"]}",
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Travel Time: ${bus["time"]}"),
-                Text("Distance: ${bus["distance"]}"),
-              ],
-            ),
-            trailing: const Icon(Icons.expand_more),
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+              child: ExpansionTile(
+                tilePadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
                 ),
-                child: Text(
-                  "More details about Bus No. ${bus["number"]} can be shown here.",
-                  style: const TextStyle(color: Colors.black54),
+                leading: const Icon(Icons.directions_bus, color: Colors.black),
+                title: Text(
+                  "No. ${bus["number"]}",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Travel Time: ${bus["time"]}"),
+                    Text("Distance: ${bus["distance"]}"),
+                  ],
+                ),
+                trailing: const Icon(Icons.expand_more),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Text(
+                      "More details about Bus No. ${bus["number"]} can be shown here.",
+                      style: const TextStyle(color: Colors.black54),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+
+            // Heart icon (top-right, only icon with border look)
+            Positioned(
+              top: -7,
+              right: 1,
+              child: IconButton(
+                icon: const Icon(
+                  Icons.favorite_border,
+                  color: Color.fromARGB(
+                    255,
+                    234,
+                    118,
+                    10,
+                  ), // Your border-like orange
+                  size: 22,
+                ),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () {
+                  // TODO: Your favorite logic here
+                  print('Tapped on favorite for bus ${bus["number"]}');
+                },
+              ),
+            ),
+          ],
         );
       },
     );
@@ -264,16 +294,44 @@ class _SuggestScreenState extends State<SuggestScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Image at the top
+              // Image with favorite icon button
               Expanded(
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(8),
-                  ),
-                  child: Image.asset(places[index], fit: BoxFit.cover),
+                child: Stack(
+                  children: [
+                    // Image
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(8),
+                      ),
+                      child: Image.asset(
+                        places[index],
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                      ),
+                    ),
+                    // Clickable favorite icon
+                    Positioned(
+                      top: -9,
+                      right: -12,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.favorite_border,
+                          color: Color.fromARGB(255, 234, 118, 10),
+                          size: 20,
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () {
+                          // TODO: Add your favorite logic here
+                          print('Favorite icon tapped for item $index');
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              // Solid orange container under the image
+              // Orange bottom container with title
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
