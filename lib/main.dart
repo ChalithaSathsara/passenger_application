@@ -36,7 +36,6 @@ class MyApp extends StatelessWidget {
       routes: {
         '/register': (context) => const RegisterScreen(),
         '/forget': (context) => const ForgotPasswordScreen(),
-        '/RecoverPassword': (context) => const EmailVerificationScreen(),
         '/EnterNewPassword': (context) => const ResetPasswordScreen(),
         '/home': (context) => const HomeScreen(),
         '/suggest': (context) => const SuggestScreen(),
@@ -52,6 +51,15 @@ class MyApp extends StatelessWidget {
         '/helpAndSupport': (context) => const HelpAndSupport(),
         '/aboutUs': (context) => const AboutUsScreen(),
         '/login': (context) => const Logingscreen(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/RecoverPassword') {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (context) => EmailVerificationScreen(email: args['email']),
+          );
+        }
+        return null;
       },
     );
   }

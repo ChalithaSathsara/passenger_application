@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'forget_password_email_verification_screen.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -179,7 +180,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.pushNamed(context, '/RecoverPassword');
+                  Navigator.pushNamed(
+                    context,
+                    '/RecoverPassword',
+                    arguments: {'email': email},
+                  );
                 },
                 child: const Text('OK'),
               ),
@@ -194,7 +199,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Error'),
-            content: Text(body['message'] ?? 'Failed to send recovery email.'),
+            content: Text(
+              body['message'] ??
+                  body['error'] ??
+                  'Failed to send recovery email.',
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),

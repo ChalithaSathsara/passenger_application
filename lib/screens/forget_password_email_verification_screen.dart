@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class EmailVerificationScreen extends StatefulWidget {
-  const EmailVerificationScreen({super.key});
+  final String email;
+  const EmailVerificationScreen({super.key, required this.email});
 
   @override
   State<EmailVerificationScreen> createState() =>
@@ -100,7 +103,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         controller: _otpController,
         keyboardType: TextInputType.text,
         inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9_-]')),
         ],
         textAlign: TextAlign.center,
         decoration: const InputDecoration(
@@ -176,8 +179,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             ),
           ),
           onPressed: () {
-            // Handle verification logic here
-            Navigator.pushNamed(context, '/EnterNewPassword');
+            _verifyOobCode();
           },
           child: const Text(
             "Verify and Proceed",
@@ -190,6 +192,91 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _verifyOobCode() async {
+    final code = _otpController.text.trim();
+    final email = widget.email;
+
+    print('User entered code: $code');
+
+    if (code.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please enter the code')));
+      return;
+    }
+
+    final url =
+        'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/passenger/verify-oob-code';
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'Email': email, 'OobCode': code}),
+      );
+
+      print('API URL: $url');
+      print(
+        'API Request Body: ${jsonEncode({'Email': email, 'OobCode': code})}',
+      );
+      print('API Status Code: ${response.statusCode}');
+      print('API Response: ${response.body}');
+
+      if (response.statusCode == 200) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Success'),
+            content: const Text(
+              'Code verified! You can now reset your password.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.pushNamed(context, '/EnterNewPassword');
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        final body = jsonDecode(response.body);
+        String errorMsg =
+            body['message'] ?? body['error'] ?? 'Verification failed.';
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: Text(errorMsg),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      print('Exception: $e');
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: Text('An error occurred: $e'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   Widget _buildFormCard() {
