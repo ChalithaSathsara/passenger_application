@@ -15,6 +15,9 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   // Fields
   String _firstName = '';
   String _lastName = '';
@@ -27,10 +30,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isConfirmPasswordVisible = false;
 
   XFile? _pickedImage;
-
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -216,6 +215,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             _buildPasswordField(
               label: "Password",
+              controller: _passwordController,
+
               isVisible: _isPasswordVisible,
               onVisibilityToggle: () {
                 setState(() {
@@ -232,6 +233,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             _buildPasswordField(
               label: "Confirm Password",
+              controller: _confirmPasswordController,
               isVisible: _isConfirmPasswordVisible,
               onVisibilityToggle: () {
                 setState(() {
@@ -240,8 +242,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               },
               onSaved: (val) => _confirmPassword = val ?? '',
               validator: (val) {
-                if (val == null || val.isEmpty) return 'Confirm your password';
-                if (val != _password) return 'Passwords do not match';
+                print("Password controller: ${_passwordController.text}");
+                print("Confirm controller: $val");
+                if (val != _passwordController.text)
+                  return 'Passwords do not match';
                 return null;
               },
             ),
@@ -319,12 +323,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     required String label,
     required bool isVisible,
     required VoidCallback onVisibilityToggle,
+    required TextEditingController controller,
     void Function(String?)? onSaved,
     String? Function(String?)? validator,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: TextFormField(
+        controller: controller,
         obscureText: !isVisible,
         decoration: InputDecoration(
           hintText: label,
