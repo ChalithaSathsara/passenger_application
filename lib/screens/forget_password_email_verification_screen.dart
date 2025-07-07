@@ -129,6 +129,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         ),
         TextButton(
           onPressed: () {
+            _resendOobCode();
             // TODO: Add resend logic
           },
           child: const Text(
@@ -142,6 +143,44 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _resendOobCode() async {
+    final email = widget.email;
+    final url =
+        'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/passenger/forgot-password';
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'Email': email}),
+      );
+
+      print('Resend API URL: $url');
+      print('Resend API Request Body: ${jsonEncode({'Email': email})}');
+      print('Resend API Status Code: ${response.statusCode}');
+      print('Resend API Response: ${response.body}');
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('A new code has been sent to your email.'),
+          ),
+        );
+      } else {
+        final body = jsonDecode(response.body);
+        String errorMsg =
+            body['message'] ?? body['error'] ?? 'Failed to resend code.';
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMsg)));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('An error occurred: $e')));
+    }
   }
 
   Widget _buildVerifyButton() {
@@ -236,7 +275,11 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.pushNamed(context, '/EnterNewPassword');
+                  Navigator.pushNamed(
+                    context,
+                    '/EnterNewPassword',
+                    arguments: {'email': email},
+                  );
                 },
                 child: const Text('OK'),
               ),

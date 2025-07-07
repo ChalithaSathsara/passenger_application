@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -20,6 +25,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+
+  XFile? _pickedImage;
+
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +80,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget _buildFormCard() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 45),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 28),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -85,6 +96,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
       child: Form(
         key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction, // Add this line
         child: Column(
           children: [
             ShaderMask(
@@ -112,25 +124,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
               alignment: Alignment.centerLeft,
               child: Stack(
                 children: [
-                  ShaderMask(
-                    shaderCallback: (bounds) =>
-                        const LinearGradient(
-                          colors: [
-                            Color(0xFFBD2D01),
-                            Color(0xFFCF4602),
-                            Color(0xFFF67F00),
-                          ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ).createShader(
-                          Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+                  _pickedImage != null
+                      ? ClipOval(
+                          child: Image.file(
+                            File(_pickedImage!.path),
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : ShaderMask(
+                          shaderCallback: (bounds) =>
+                              const LinearGradient(
+                                colors: [
+                                  Color(0xFFBD2D01),
+                                  Color(0xFFCF4602),
+                                  Color(0xFFF67F00),
+                                ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ).createShader(
+                                Rect.fromLTWH(
+                                  0,
+                                  0,
+                                  bounds.width,
+                                  bounds.height,
+                                ),
+                              ),
+                          child: const Icon(
+                            Icons.account_circle,
+                            size: 60,
+                            color: Colors.white,
+                          ),
                         ),
-                    child: const Icon(
-                      Icons.account_circle,
-                      size: 60,
-                      color: Colors.white, // must be white for gradient to show
-                    ),
-                  ),
                   Positioned(
                     bottom: 0,
                     right: 0,
@@ -142,6 +168,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       padding: const EdgeInsets.all(4),
                       child: InkWell(
                         onTap: () {
+                          _pickImage();
                           // Add image picker logic here if needed
                         },
                         child: const Icon(
@@ -156,13 +183,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            _buildTextField("First Name", (val) => _firstName = val ?? ''),
-            _buildTextField("Last Name", (val) => _lastName = val ?? ''),
-            _buildTextField("Username", (val) => _username = val ?? ''),
+            _buildTextField(
+              "First Name",
+              (val) => _firstName = val ?? '',
+              validator: (val) {
+                if (val == null || val.trim().isEmpty)
+                  return 'First name is required';
+                return null;
+              },
+            ),
+            _buildTextField(
+              "Last Name",
+              (val) => _lastName = val ?? '',
+              validator: (val) {
+                if (val == null || val.trim().isEmpty)
+                  return 'Last name is required';
+                return null;
+              },
+            ),
             _buildTextField(
               "Email",
               (val) => _email = val ?? '',
               keyboardType: TextInputType.emailAddress,
+              validator: (val) {
+                if (val == null || val.trim().isEmpty)
+                  return 'Email is required';
+                final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                if (!emailRegex.hasMatch(val.trim()))
+                  return 'Enter a valid email';
+                return null;
+              },
             ),
             _buildPasswordField(
               label: "Password",
@@ -173,6 +223,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 });
               },
               onSaved: (val) => _password = val ?? '',
+              validator: (val) {
+                if (val == null || val.isEmpty) return 'Password is required';
+                if (val.length < 6)
+                  return 'Password must be at least 6 characters';
+                return null;
+              },
             ),
             _buildPasswordField(
               label: "Confirm Password",
@@ -183,6 +239,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 });
               },
               onSaved: (val) => _confirmPassword = val ?? '',
+              validator: (val) {
+                if (val == null || val.isEmpty) return 'Confirm your password';
+                if (val != _password) return 'Passwords do not match';
+                return null;
+              },
             ),
             const SizedBox(height: 12),
             _buildRegisterButton(),
@@ -196,10 +257,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  Future<String?> _uploadProfilePicture(XFile image) async {
+    final url = Uri.parse(
+      'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/passenger/upload-profile-picture',
+    );
+    final request = http.MultipartRequest('POST', url);
+    request.files.add(await http.MultipartFile.fromPath('file', image.path));
+
+    final response = await request.send();
+    if (response.statusCode == 200) {
+      final respStr = await response.stream.bytesToString();
+      final data = jsonDecode(respStr);
+      // Assuming the API returns: { "link": "https://..." }
+      return data['link'];
+    } else {
+      return null;
+    }
+  }
+
   Widget _buildTextField(
     String label,
     void Function(String?) onSaved, {
     TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -220,8 +300,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
         onSaved: onSaved,
+        validator: validator, // <-- add this
       ),
     );
+  }
+
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _pickedImage = image;
+      });
+    }
   }
 
   Widget _buildPasswordField({
@@ -229,6 +320,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     required bool isVisible,
     required VoidCallback onVisibilityToggle,
     void Function(String?)? onSaved,
+    String? Function(String?)? validator,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -256,6 +348,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
         onSaved: onSaved,
+        validator: validator, // <-- add this
       ),
     );
   }
@@ -278,9 +371,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
         borderRadius: BorderRadius.circular(10),
       ),
       child: TextButton(
-        onPressed: () {
-          Navigator.pushNamed(context, "/login");
-          _formKey.currentState?.save();
+        onPressed: () async {
+          if (_formKey.currentState?.validate() ?? false) {
+            _formKey.currentState?.save();
+
+            String? profileImageUrl;
+            if (_pickedImage != null) {
+              profileImageUrl = await _uploadProfilePicture(_pickedImage!);
+              if (profileImageUrl == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Failed to upload profile picture'),
+                  ),
+                );
+                return;
+              }
+            }
+
+            // Now you have the image link in profileImageUrl
+            // You can use it in your registration API call or hold it in a variable
+            print('Profile image link: $profileImageUrl');
+
+            Navigator.pushNamed(context, "/login");
+            // Or call your registration API here, passing profileImageUrl if needed
+          }
         },
         child: const Text(
           'Register',
