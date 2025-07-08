@@ -378,23 +378,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
       child: TextButton(
         onPressed: () async {
+          print('[DEBUG] Register button pressed');
           if (_formKey.currentState?.validate() ?? false) {
+            print('[DEBUG] Form validated');
             _formKey.currentState?.save();
 
-            String? profileImageUrl;
-            if (_pickedImage != null) {
-              profileImageUrl = await _uploadProfilePicture(_pickedImage!);
-              if (profileImageUrl == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Failed to upload profile picture'),
-                  ),
-                );
-                return;
-              }
+            // Require profile image
+            if (_pickedImage == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Please select a profile image.')),
+              );
+              print('[DEBUG] No profile image selected. Registration stopped.');
+              return;
+            }
+
+            print('[DEBUG] Image picked, uploading...');
+            String? profileImageUrl = await _uploadProfilePicture(
+              _pickedImage!,
+            );
+            print('[DEBUG] Profile image URL: \\${profileImageUrl}');
+            if (profileImageUrl == null) {
+              print('[DEBUG] Profile image upload failed');
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Failed to upload profile picture'),
+                ),
+              );
+              return;
             }
 
             // Call registration API
+            print(
+              '[DEBUG] Sending registration data: FirstName=\${_firstName}, LastName=\${_lastName}, Email=\${_email}, Password=\${_password}, ProfilePictureURL=\${profileImageUrl}',
+            );
             bool success = await _registerPassenger(
               firstName: _firstName,
               lastName: _lastName,
@@ -403,6 +419,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               profilePictureUrl: profileImageUrl,
             );
 
+            print('[DEBUG] Registration API success: \\${success}');
             if (success) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Registration successful!')),
@@ -413,6 +430,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SnackBar(content: Text('Registration failed!')),
               );
             }
+          } else {
+            print('[DEBUG] Form validation failed');
           }
         },
         child: const Text(
@@ -545,17 +564,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final url = Uri.parse(
       'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/passenger',
     );
+    final body = jsonEncode({
+      "FirstName": firstName,
+      "LastName": lastName,
+      "Email": email,
+      "Password": password,
+      "profileImageUrl": profilePictureUrl ?? "",
+    });
+    print('[DEBUG] Registration JSON body: $body');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        "FirstName": firstName,
-        "LastName": lastName,
-        "Email": email,
-        "Password": password,
-        "ProfilePictureURL": profilePictureUrl ?? "",
-      }),
+      body: body,
     );
+    print('[DEBUG] Registration response status: ${response.statusCode}');
+    print('[DEBUG] Registration response body: ${response.body}');
     return response.statusCode == 200 || response.statusCode == 201;
   }
 }
