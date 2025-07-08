@@ -11,6 +11,15 @@ class LiveMapScreen extends StatefulWidget {
 class _LiveMapScreenState extends State<LiveMapScreen> {
   int _selectedIndex = 2;
   bool isSwapped = false;
+  final TextEditingController _startController = TextEditingController();
+  final TextEditingController _destinationController = TextEditingController();
+
+  @override
+  void dispose() {
+    _startController.dispose();
+    _destinationController.dispose();
+    super.dispose();
+  }
 
   Widget _buildHeader() {
     return Container(
@@ -74,6 +83,7 @@ class _LiveMapScreenState extends State<LiveMapScreen> {
                 SizedBox(
                   height: 44,
                   child: TextField(
+                    controller: _startController,
                     decoration: InputDecoration(
                       hintText: "Choose starting point",
                       hintStyle: const TextStyle(color: Colors.black54),
@@ -109,6 +119,7 @@ class _LiveMapScreenState extends State<LiveMapScreen> {
                 SizedBox(
                   height: 44,
                   child: TextField(
+                    controller: _destinationController,
                     decoration: InputDecoration(
                       hintText: "Choose destination",
                       hintStyle: const TextStyle(color: Colors.black54),
@@ -150,6 +161,9 @@ class _LiveMapScreenState extends State<LiveMapScreen> {
             onTap: () {
               setState(() {
                 isSwapped = !isSwapped;
+                final temp = _startController.text;
+                _startController.text = _destinationController.text;
+                _destinationController.text = temp;
               });
             },
             child: AnimatedRotation(

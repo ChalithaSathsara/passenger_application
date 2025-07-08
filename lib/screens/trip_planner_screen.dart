@@ -13,6 +13,15 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   bool isSwapped = false;
   bool showPanel = false; // Show bottom panel after search
   int expandedIndex = -1; // For expanding/collapsing itinerary details
+  final TextEditingController _startController = TextEditingController();
+  final TextEditingController _destinationController = TextEditingController();
+
+  @override
+  void dispose() {
+    _startController.dispose();
+    _destinationController.dispose();
+    super.dispose();
+  }
 
   Widget _buildHeader() {
     return Container(
@@ -78,6 +87,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 SizedBox(
                   height: 44,
                   child: TextField(
+                    controller: _startController,
                     onSubmitted: (_) {
                       setState(() {
                         showPanel = true;
@@ -99,6 +109,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 SizedBox(
                   height: 44,
                   child: TextField(
+                    controller: _destinationController,
                     onSubmitted: (_) {
                       setState(() {
                         showPanel = true;
@@ -127,6 +138,9 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
             onTap: () {
               setState(() {
                 isSwapped = !isSwapped;
+                final temp = _startController.text;
+                _startController.text = _destinationController.text;
+                _destinationController.text = temp;
               });
             },
             child: AnimatedRotation(
