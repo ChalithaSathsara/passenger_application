@@ -394,12 +394,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
               }
             }
 
-            // Now you have the image link in profileImageUrl
-            // You can use it in your registration API call or hold it in a variable
-            print('Profile image link: $profileImageUrl');
+            // Call registration API
+            bool success = await _registerPassenger(
+              firstName: _firstName,
+              lastName: _lastName,
+              email: _email,
+              password: _password,
+              profilePictureUrl: profileImageUrl,
+            );
 
-            Navigator.pushNamed(context, "/login");
-            // Or call your registration API here, passing profileImageUrl if needed
+            if (success) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Registration successful!')),
+              );
+              Navigator.pushNamed(context, "/login");
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Registration failed!')),
+              );
+            }
           }
         },
         child: const Text(
@@ -520,5 +533,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
     );
+  }
+
+  Future<bool> _registerPassenger({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String password,
+    String? profilePictureUrl,
+  }) async {
+    final url = Uri.parse(
+      'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/passenger',
+    );
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        "FirstName": firstName,
+        "LastName": lastName,
+        "Email": email,
+        "Password": password,
+        "ProfilePictureURL": profilePictureUrl ?? "",
+      }),
+    );
+    return response.statusCode == 200 || response.statusCode == 201;
   }
 }
