@@ -147,8 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildTextField(hint: "John"),
           const SizedBox(height: 12),
           _buildTextField(hint: "Rubic"),
-          const SizedBox(height: 12),
-          _buildTextField(hint: "john99"),
+
           const SizedBox(height: 12),
           _buildTextField(hint: "john99@gmail.com"),
           const SizedBox(height: 12),

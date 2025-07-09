@@ -14,6 +14,7 @@ class _LogingscreenState extends State<Logingscreen> {
 
   String _email = '';
   String _password = '';
+  String _passengerId = ''; // Add passenger ID variable
   bool _isPasswordVisible = false;
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
@@ -265,48 +266,105 @@ class _LogingscreenState extends State<Logingscreen> {
   }
 
   Future<void> _login() async {
-    final response = await http.post(
-      Uri.parse(
-        'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/passenger/login',
-      ),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'Email': _email,
-        'Password': _password,
-      }),
-    );
+    // First, check if the email is registered
+    try {
+      final emailCheckResponse = await http.get(
+        Uri.parse(
+          'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/Passenger/get-id-by-email/${Uri.encodeComponent(_email)}',
+        ),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      Navigator.pushNamed(context, '/home');
-    } else {
-      String errorMsg = 'Login failed. Please try again.';
-      try {
-        final Map<String, dynamic> body = jsonDecode(response.body);
-        print('API Error: ${body['error']}');
-        print('API Message: ${body['message']}');
-        print('API Response: ${response.body}');
-        print('API URL: ${response.request?.url}');
+      if (emailCheckResponse.statusCode == 200) {
+        // Email is registered, get the passenger ID
+        final Map<String, dynamic> emailData = jsonDecode(
+          emailCheckResponse.body,
+        );
+        _passengerId = emailData['passengerId'];
+        print('Passenger ID: $_passengerId');
 
-        if (body['error'] == 'INVALID_LOGIN_CREDENTIALS') {
-          errorMsg = 'Invalid username or password.';
-        } else if (body['error'] == 'INVALID_EMAIL') {
-          errorMsg = 'Invalid email format.';
-        } else if (body['error'] == 'MISSING_PASSWORD') {
-          errorMsg = 'Please enter your password.';
-        } else if (body['message'] != null) {
-          errorMsg = body['message'];
+        // Now proceed with login
+        final loginResponse = await http.post(
+          Uri.parse(
+            'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/passenger/login',
+          ),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(<String, String>{
+            'Email': _email,
+            'Password': _password,
+          }),
+        );
+
+        if (loginResponse.statusCode == 200) {
+          // Login successful, navigate to home with passenger ID
+          Navigator.pushNamed(context, '/home');
+        } else {
+          String errorMsg = 'Login failed. Please try again.';
+          try {
+            final Map<String, dynamic> body = jsonDecode(loginResponse.body);
+            print('API Error: ${body['error']}');
+            print('API Message: ${body['message']}');
+            print('API Response: ${loginResponse.body}');
+            print('API URL: ${loginResponse.request?.url}');
+
+            if (body['error'] == 'INVALID_LOGIN_CREDENTIALS') {
+              errorMsg = 'Invalid username or password.';
+            } else if (body['error'] == 'INVALID_EMAIL') {
+              errorMsg = 'Invalid email format.';
+            } else if (body['error'] == 'MISSING_PASSWORD') {
+              errorMsg = 'Please enter your password.';
+            } else if (body['message'] != null) {
+              errorMsg = body['message'];
+            }
+          } catch (e) {
+            print('Error parsing response: $e');
+          }
+
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Login Failed'),
+              content: Text(errorMsg),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
         }
-      } catch (e) {
-        print('Error parsing response: $e');
+      } else {
+        // Email is not registered
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Email Not Registered'),
+            content: const Text(
+              'This email address is not registered. Please register first or use a different email.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
       }
-
+    } catch (e) {
+      print('Error checking email: $e');
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Login Failed'),
-          content: Text(errorMsg),
+          title: const Text('Connection Error'),
+          content: const Text(
+            'Unable to connect to the server. Please check your internet connection and try again.',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
