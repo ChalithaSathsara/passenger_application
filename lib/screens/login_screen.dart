@@ -301,7 +301,11 @@ class _LogingscreenState extends State<Logingscreen> {
 
         if (loginResponse.statusCode == 200) {
           // Login successful, navigate to home with passenger ID
-          Navigator.pushNamed(context, '/home');
+          Navigator.pushReplacementNamed(
+            context,
+            '/home',
+            arguments: {'passengerId': _passengerId},
+          );
         } else {
           String errorMsg = 'Login failed. Please try again.';
           try {

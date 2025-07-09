@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MoreScreen extends StatefulWidget {
-  const MoreScreen({super.key});
+  final String passengerId;
+  const MoreScreen({Key? key, required this.passengerId}) : super(key: key);
 
   @override
   State<MoreScreen> createState() => _MoreScreenState();
@@ -41,7 +42,11 @@ class _MoreScreenState extends State<MoreScreen> {
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/home');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/home',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                 },
               ),
             ],
@@ -219,22 +224,46 @@ class _MoreScreenState extends State<MoreScreen> {
 
               switch (index) {
                 case 0:
-                  Navigator.pushReplacementNamed(context, '/home');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/home',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 1:
-                  Navigator.pushReplacementNamed(context, '/tripPlanner');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/tripPlanner',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 2:
-                  Navigator.pushReplacementNamed(context, '/liveMap');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/liveMap',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 3:
-                  Navigator.pushReplacementNamed(context, '/favourites');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/favourites',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 4:
-                  Navigator.pushReplacementNamed(context, '/notifications');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/notifications',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 5:
-                  Navigator.pushReplacementNamed(context, '/more');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/more',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
               }
             },

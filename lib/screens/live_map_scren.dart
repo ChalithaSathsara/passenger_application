@@ -2,7 +2,8 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 
 class LiveMapScreen extends StatefulWidget {
-  const LiveMapScreen({super.key});
+  final String passengerId;
+  const LiveMapScreen({Key? key, required this.passengerId}) : super(key: key);
 
   @override
   State<LiveMapScreen> createState() => _LiveMapScreenState();
@@ -29,7 +30,11 @@ class _LiveMapScreenState extends State<LiveMapScreen> {
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.pushReplacementNamed(context, '/home');
+              Navigator.pushReplacementNamed(
+                context,
+                '/home',
+                arguments: {'passengerId': widget.passengerId},
+              );
             },
             child: const Icon(Icons.arrow_back, color: Colors.white),
           ),
@@ -224,22 +229,46 @@ class _LiveMapScreenState extends State<LiveMapScreen> {
 
               switch (index) {
                 case 0:
-                  Navigator.pushReplacementNamed(context, '/home');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/home',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 1:
-                  Navigator.pushReplacementNamed(context, '/tripPlanner');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/tripPlanner',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 2:
-                  Navigator.pushReplacementNamed(context, '/liveMap');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/liveMap',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 3:
-                  Navigator.pushReplacementNamed(context, '/favourites');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/favourites',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 4:
-                  Navigator.pushReplacementNamed(context, '/notifications');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/notifications',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 5:
-                  Navigator.pushReplacementNamed(context, '/more');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/more',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
               }
             },

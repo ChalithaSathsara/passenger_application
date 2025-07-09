@@ -37,15 +37,8 @@ class MyApp extends StatelessWidget {
         '/register': (context) => const RegisterScreen(),
         '/forget': (context) => const ForgotPasswordScreen(),
 
-        '/home': (context) => const HomeScreen(),
-        '/suggest': (context) => const SuggestScreen(),
-        '/tripPlanner': (context) => const TripPlannerScreen(),
         '/placesAroundLocation': (context) =>
             const PlacesAroundLocationScreen(),
-        '/liveMap': (context) => const LiveMapScreen(),
-        '/favourites': (context) => const FavouriteScreen(),
-        '/notifications': (context) => const NotificationsScreen(),
-        '/more': (context) => const MoreScreen(),
         '/profile': (context) => const ProfileScreen(),
         '/feedback': (context) => const FeedbackScreen(),
         '/helpAndSupport': (context) => const HelpAndSupport(),
@@ -64,6 +57,139 @@ class MyApp extends StatelessWidget {
           return MaterialPageRoute(
             builder: (context) => ResetPasswordScreen(email: args['email']),
           );
+        }
+        if (settings.name == '/home') {
+          final args = settings.arguments;
+          if (args is Map<String, dynamic> && args['passengerId'] != null) {
+            return MaterialPageRoute(
+              builder: (context) =>
+                  HomeScreen(passengerId: args['passengerId']),
+            );
+          } else {
+            return MaterialPageRoute(
+              builder: (context) => Scaffold(
+                body: Center(
+                  child: Text('Missing passengerId for home screen'),
+                ),
+              ),
+            );
+          }
+        }
+        if (settings.name == '/more') {
+          final args = settings.arguments;
+          if (args is Map<String, dynamic> && args['passengerId'] != null) {
+            return MaterialPageRoute(
+              builder: (context) =>
+                  MoreScreen(passengerId: args['passengerId']),
+            );
+          } else {
+            return MaterialPageRoute(
+              builder: (context) => Scaffold(
+                body: Center(
+                  child: Text('Missing passengerId for more screen'),
+                ),
+              ),
+            );
+          }
+        }
+        if (settings.name == '/tripPlanner') {
+          final args = settings.arguments;
+          if (args is Map<String, dynamic> && args['passengerId'] != null) {
+            return MaterialPageRoute(
+              builder: (context) =>
+                  TripPlannerScreen(passengerId: args['passengerId']),
+            );
+          } else {
+            return MaterialPageRoute(
+              builder: (context) => Scaffold(
+                body: Center(
+                  child: Text('Missing passengerId for trip planner screen'),
+                ),
+              ),
+            );
+          }
+        }
+        if (settings.name == '/liveMap') {
+          final args = settings.arguments;
+          if (args is Map<String, dynamic> && args['passengerId'] != null) {
+            return MaterialPageRoute(
+              builder: (context) =>
+                  LiveMapScreen(passengerId: args['passengerId']),
+            );
+          } else {
+            return MaterialPageRoute(
+              builder: (context) => Scaffold(
+                body: Center(
+                  child: Text('Missing passengerId for live map screen'),
+                ),
+              ),
+            );
+          }
+        }
+        if (settings.name == '/favourites') {
+          final args = settings.arguments;
+          if (args is Map<String, dynamic> && args['passengerId'] != null) {
+            final showBuses =
+                args['showBuses'] ?? true; // Default to true if not provided
+            return MaterialPageRoute(
+              builder: (context) => FavouriteScreen(
+                key: ValueKey(
+                  'favourites_${showBuses}_${DateTime.now().millisecondsSinceEpoch}',
+                ),
+                passengerId: args['passengerId'],
+                initialShowBuses: showBuses,
+              ),
+            );
+          } else {
+            return MaterialPageRoute(
+              builder: (context) => Scaffold(
+                body: Center(
+                  child: Text('Missing passengerId for favourites screen'),
+                ),
+              ),
+            );
+          }
+        }
+        if (settings.name == '/notifications') {
+          final args = settings.arguments;
+          if (args is Map<String, dynamic> && args['passengerId'] != null) {
+            return MaterialPageRoute(
+              builder: (context) =>
+                  NotificationsScreen(passengerId: args['passengerId']),
+            );
+          } else {
+            return MaterialPageRoute(
+              builder: (context) => Scaffold(
+                body: Center(
+                  child: Text('Missing passengerId for notifications screen'),
+                ),
+              ),
+            );
+          }
+        }
+        if (settings.name == '/suggest') {
+          final args = settings.arguments;
+          if (args is Map<String, dynamic> && args['passengerId'] != null) {
+            final showBuses =
+                args['showBuses'] ?? true; // Default to true if not provided
+            return MaterialPageRoute(
+              builder: (context) => SuggestScreen(
+                key: ValueKey(
+                  'suggest_${showBuses}_${DateTime.now().millisecondsSinceEpoch}',
+                ),
+                passengerId: args['passengerId'],
+                initialShowBuses: showBuses,
+              ),
+            );
+          } else {
+            return MaterialPageRoute(
+              builder: (context) => Scaffold(
+                body: Center(
+                  child: Text('Missing passengerId for suggest screen'),
+                ),
+              ),
+            );
+          }
         }
         return null;
       },

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String passengerId;
+  const HomeScreen({Key? key, required this.passengerId}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -156,7 +157,10 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.pushNamed(
                 context,
                 '/suggest',
-                arguments: true, // showBuses: true
+                arguments: {
+                  'passengerId': widget.passengerId,
+                  'showBuses': true,
+                },
               );
             },
           ),
@@ -164,11 +168,12 @@ class _HomeScreenState extends State<HomeScreen> {
             "Places",
             "assets/images/Places.png",
             onTap: () {
-              Navigator.pushNamed(
-                context,
-                '/suggest',
-                arguments: false, // showBuses: false
-              );
+              final args = {
+                'passengerId': widget.passengerId,
+                'showBuses': false,
+              };
+              print('HomeScreen - Navigating to suggest with args: $args');
+              Navigator.pushNamed(context, '/suggest', arguments: args);
             },
           ),
         ],
@@ -190,7 +195,10 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.pushNamed(
                 context,
                 '/favourites',
-                arguments: true,
+                arguments: {
+                  'passengerId': widget.passengerId,
+                  'showBuses': true,
+                },
               ); // showBuses: true
             },
           ),
@@ -199,10 +207,15 @@ class _HomeScreenState extends State<HomeScreen> {
             "assets/images/Places.png",
             showFavorite: true,
             onTap: () {
+              final args = {
+                'passengerId': widget.passengerId,
+                'showBuses': false,
+              };
+              print('HomeScreen - Navigating to favourites with args: $args');
               Navigator.pushNamed(
                 context,
                 '/favourites',
-                arguments: false,
+                arguments: args,
               ); // showBuses: false
             },
           ),
@@ -302,9 +315,17 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ElevatedButton(
         onPressed: () {
           if (label == "Plan Trip") {
-            Navigator.pushNamed(context, '/tripPlanner');
+            Navigator.pushNamed(
+              context,
+              '/tripPlanner',
+              arguments: {'passengerId': widget.passengerId},
+            );
           } else if (label == "View Live Map") {
-            Navigator.pushNamed(context, '/liveMap');
+            Navigator.pushNamed(
+              context,
+              '/liveMap',
+              arguments: {'passengerId': widget.passengerId},
+            );
           }
         },
         style: ElevatedButton.styleFrom(
@@ -354,22 +375,46 @@ class _HomeScreenState extends State<HomeScreen> {
 
               switch (index) {
                 case 0:
-                  Navigator.pushReplacementNamed(context, '/home');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/home',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 1:
-                  Navigator.pushReplacementNamed(context, '/tripPlanner');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/tripPlanner',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 2:
-                  Navigator.pushReplacementNamed(context, '/liveMap');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/liveMap',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 3:
-                  Navigator.pushReplacementNamed(context, '/favourites');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/favourites',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 4:
-                  Navigator.pushReplacementNamed(context, '/notifications');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/notifications',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 5:
-                  Navigator.pushReplacementNamed(context, '/more');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/more',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
               }
             },

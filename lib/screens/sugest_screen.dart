@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 
 class SuggestScreen extends StatefulWidget {
-  const SuggestScreen({super.key});
+  final String passengerId;
+  final bool? initialShowBuses;
+  const SuggestScreen({
+    Key? key,
+    required this.passengerId,
+    this.initialShowBuses,
+  }) : super(key: key);
 
   @override
   State<SuggestScreen> createState() => _SuggestScreenState();
@@ -10,6 +16,15 @@ class SuggestScreen extends StatefulWidget {
 class _SuggestScreenState extends State<SuggestScreen> {
   bool showBuses = true;
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set initial state based on constructor parameter
+    if (widget.initialShowBuses != null) {
+      showBuses = widget.initialShowBuses!;
+    }
+  }
 
   // Sample dynamic data
   final List<Map<String, String>> busList = [
@@ -32,11 +47,21 @@ class _SuggestScreenState extends State<SuggestScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final arg = ModalRoute.of(context)!.settings.arguments;
-    if (arg != null && arg is bool) {
-      setState(() {
-        showBuses = arg;
-      });
+    // Check arguments every time dependencies change
+    final args = ModalRoute.of(context)?.settings.arguments;
+    print('SuggestScreen - Arguments received: $args');
+    if (args != null &&
+        args is Map<String, dynamic> &&
+        args['showBuses'] != null) {
+      final newShowBuses = args['showBuses'] as bool;
+      print(
+        'SuggestScreen - showBuses value: $newShowBuses, current: $showBuses',
+      );
+      if (mounted) {
+        setState(() {
+          showBuses = newShowBuses;
+        });
+      }
     }
   }
 
@@ -68,7 +93,11 @@ class _SuggestScreenState extends State<SuggestScreen> {
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pushReplacementNamed(
+                context,
+                '/home',
+                arguments: {'passengerId': widget.passengerId},
+              );
             },
             child: const Icon(Icons.arrow_back, color: Colors.white),
           ),
@@ -387,22 +416,46 @@ class _SuggestScreenState extends State<SuggestScreen> {
 
               switch (index) {
                 case 0:
-                  Navigator.pushReplacementNamed(context, '/home');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/home',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 1:
-                  Navigator.pushReplacementNamed(context, '/tripPlanner');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/tripPlanner',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 2:
-                  Navigator.pushReplacementNamed(context, '/liveMap');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/liveMap',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 3:
-                  Navigator.pushReplacementNamed(context, '/favourites');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/favourites',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 4:
-                  Navigator.pushReplacementNamed(context, '/notifications');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/notifications',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
                 case 5:
-                  Navigator.pushReplacementNamed(context, '/more');
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/more',
+                    arguments: {'passengerId': widget.passengerId},
+                  );
                   break;
               }
             },
