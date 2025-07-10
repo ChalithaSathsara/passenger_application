@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class MoreScreen extends StatefulWidget {
   final String passengerId;
@@ -9,9 +11,36 @@ class MoreScreen extends StatefulWidget {
 }
 
 class _MoreScreenState extends State<MoreScreen> {
-  String userName = "John Rubic";
+  String userName = "";
   String? profileImageUrl;
   int _selectedIndex = 5;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPassengerNameAndImage();
+  }
+
+  Future<void> _fetchPassengerNameAndImage() async {
+    try {
+      final url =
+          'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/passenger/${widget.passengerId}';
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final firstName = data['firstName'] ?? '';
+        final lastName = data['lastName'] ?? '';
+        setState(() {
+          userName = (firstName + ' ' + lastName).trim();
+          profileImageUrl = data['profileImageUrl'];
+        });
+      } else {
+        print('Failed to fetch passenger data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching passenger data: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

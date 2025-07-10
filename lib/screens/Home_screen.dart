@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
   final String passengerId;
@@ -10,6 +12,41 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  String fullName = "";
+  bool _isLoadingName = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPassengerName();
+  }
+
+  Future<void> _fetchPassengerName() async {
+    try {
+      final url =
+          'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/passenger/${widget.passengerId}';
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final firstName = data['firstName'] ?? '';
+        final lastName = data['lastName'] ?? '';
+        setState(() {
+          fullName = (firstName + ' ' + lastName).trim();
+          _isLoadingName = false;
+        });
+      } else {
+        print('Failed to fetch passenger data: ${response.statusCode}');
+        setState(() {
+          _isLoadingName = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching passenger data: $e');
+      setState(() {
+        _isLoadingName = false;
+      });
+    }
+  }
 
   Widget _buildHeader() {
     return Container(
@@ -23,15 +60,23 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: Row(
         children: [
-          const Expanded(
-            child: Text(
-              "Hi John Rubik,\nGood Afternoon!",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-                color: Colors.black,
-              ),
-            ),
+          Expanded(
+            child: _isLoadingName
+                ? const Center(
+                    child: SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  )
+                : Text(
+                    'Hi $fullName,\nGood Afternoon!',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: Colors.black,
+                    ),
+                  ),
           ),
           CircleAvatar(
             radius: 18,
