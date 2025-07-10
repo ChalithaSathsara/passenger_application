@@ -98,7 +98,11 @@ class _MoreScreenState extends State<MoreScreen> {
             icon: Icons.person,
             text: "Profile",
             onTap: () {
-              Navigator.pushNamed(context, '/profile');
+              Navigator.pushNamed(
+                context,
+                '/profile',
+                arguments: {'passengerId': widget.passengerId},
+              );
             },
           ),
           const SizedBox(height: 20),
