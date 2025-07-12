@@ -15,16 +15,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // Placeholder for profile image URL from DB
   String? profileImageUrl;
   bool _isLoadingImage = true;
-  bool _hasImageError = false;
 
   // Controllers for text fields
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
-  // Password visibility toggles
-  bool _obscurePassword = true;
-  bool _obscureConfirm = true;
+  // Email validation
+  String? _emailError;
+  bool _isUpdating = false;
 
   @override
   void dispose() {
@@ -44,7 +43,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       setState(() {
         _isLoadingImage = true;
-        _hasImageError = false;
       });
 
       // Get the passenger data to extract the profile image URL and details
@@ -73,19 +71,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _emailController.text = passengerData['email'] ?? '';
 
           if (imageUrl != null && imageUrl.isNotEmpty) {
-            await _testImageUrl(imageUrl);
+            setState(() {
+              profileImageUrl = imageUrl;
+              _isLoadingImage = false;
+            });
           } else {
             print('No profile image URL found in passenger data');
             setState(() {
               _isLoadingImage = false;
-              _hasImageError = false; // Not really an error, just no image
             });
           }
         } catch (jsonError) {
           print('JSON parsing error for passenger data: $jsonError');
           setState(() {
             _isLoadingImage = false;
-            _hasImageError = true;
           });
         }
       } else {
@@ -94,66 +93,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
         setState(() {
           _isLoadingImage = false;
-          _hasImageError = true;
         });
       }
     } catch (e) {
       print('Error fetching profile image: $e');
       setState(() {
         _isLoadingImage = false;
-        _hasImageError = true;
-      });
-    }
-  }
-
-  Future<void> _testImageUrl(String imageUrl) async {
-    try {
-      print('Testing image URL accessibility: $imageUrl');
-
-      final response = await http.head(Uri.parse(imageUrl));
-      print('Image URL test status: ${response.statusCode}');
-
-      if (response.statusCode == 200) {
-        print('Image URL is accessible');
-        setState(() {
-          profileImageUrl = imageUrl;
-          _isLoadingImage = false;
-        });
-        print('Profile image URL set successfully: $imageUrl');
-      } else {
-        print('Image URL is not accessible (status: ${response.statusCode})');
-        // Try to convert Google Drive URL to direct download link
-        if (imageUrl.contains('drive.google.com')) {
-          final directUrl = _convertGoogleDriveUrl(imageUrl);
-          print('Trying converted Google Drive URL: $directUrl');
-
-          final directResponse = await http.head(Uri.parse(directUrl));
-          if (directResponse.statusCode == 200) {
-            print('Converted Google Drive URL is accessible');
-            setState(() {
-              profileImageUrl = directUrl;
-              _isLoadingImage = false;
-            });
-            print('Profile image URL set successfully: $directUrl');
-          } else {
-            print('Converted Google Drive URL is not accessible');
-            setState(() {
-              _isLoadingImage = false;
-              _hasImageError = true;
-            });
-          }
-        } else {
-          setState(() {
-            _isLoadingImage = false;
-            _hasImageError = true;
-          });
-        }
-      }
-    } catch (e) {
-      print('Error testing image URL: $e');
-      setState(() {
-        _isLoadingImage = false;
-        _hasImageError = true;
       });
     }
   }
@@ -165,6 +110,88 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return 'https://drive.google.com/uc?export=view&id=$fileId';
     }
     return originalUrl;
+  }
+
+  // Email validation method
+  bool _validateEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
+  }
+
+  // Update passenger details
+  Future<void> _updatePassengerDetails() async {
+    // Validate email first
+    final email = _emailController.text.trim();
+    if (!_validateEmail(email)) {
+      setState(() {
+        _emailError = 'Please enter a valid email address';
+      });
+      return;
+    }
+
+    setState(() {
+      _emailError = null;
+      _isUpdating = true;
+    });
+
+    try {
+      final url =
+          'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/Passenger/${widget.passengerId}';
+
+      // Prepare the update data
+      final updateData = {
+        "passengerId": widget.passengerId,
+        "firstName": _firstNameController.text.trim(),
+        "lastName": _lastNameController.text.trim(),
+        "email": email,
+        "password": "", // Keep empty as we're not updating password
+        "favoriteRoutes": [],
+        "favoritePlaces": [],
+        "CurrentLocationLatitude": 0.0,
+        "CurrentLocationLongitude": 0.0,
+      };
+
+      print('Updating passenger with data: $updateData');
+
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(updateData),
+      );
+
+      print('Update response status: ${response.statusCode}');
+      print('Update response body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        // Show success message for both 200 and 204 status codes
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile updated successfully!'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to update profile: ${response.statusCode}'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error updating passenger: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error updating profile: $e'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } finally {
+      setState(() {
+        _isUpdating = false;
+      });
+    }
   }
 
   // Debug method to test if passenger exists
@@ -290,29 +317,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               CircleAvatar(
                 radius: 35,
                 backgroundColor: const Color(0xFFFFA54F),
-                backgroundImage:
-                    profileImageUrl != null &&
-                        !_isLoadingImage &&
-                        !_hasImageError
+                backgroundImage: profileImageUrl != null && !_isLoadingImage
                     ? NetworkImage(profileImageUrl!)
-                    : null,
-                onBackgroundImageError:
-                    profileImageUrl != null &&
-                        !_isLoadingImage &&
-                        !_hasImageError
-                    ? (exception, stackTrace) {
-                        print('Error loading profile image: $exception');
-                        setState(() {
-                          _hasImageError = true;
-                        });
-                      }
                     : null,
                 child: _isLoadingImage
                     ? const CircularProgressIndicator(
                         color: Colors.white,
                         strokeWidth: 2,
                       )
-                    : profileImageUrl == null || _hasImageError
+                    : profileImageUrl == null
                     ? Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -371,26 +384,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             controller: _emailController,
             hint: "john99@gmail.com",
           ),
-          const SizedBox(height: 12),
-          _buildPasswordField(
-            hint: "********",
-            obscure: _obscurePassword,
-            onToggle: () {
-              setState(() {
-                _obscurePassword = !_obscurePassword;
-              });
-            },
-          ),
-          const SizedBox(height: 12),
-          _buildPasswordField(
-            hint: "********",
-            obscure: _obscureConfirm,
-            onToggle: () {
-              setState(() {
-                _obscureConfirm = !_obscureConfirm;
-              });
-            },
-          ),
+          if (_emailError != null)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.only(top: 8, left: 12),
+              child: Text(
+                _emailError!,
+                style: const TextStyle(color: Colors.red, fontSize: 12),
+              ),
+            ),
           const SizedBox(height: 16),
           Align(
             alignment: Alignment.centerRight,
@@ -400,9 +402,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               shadowColor: Colors.black.withOpacity(0.7),
               child: InkWell(
                 borderRadius: BorderRadius.circular(10),
-                onTap: () {
-                  // Handle update
-                },
+                onTap: _isUpdating ? null : _updatePassengerDetails,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -422,13 +422,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
-                  child: const Text(
-                    "Update",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: _isUpdating
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          "Update",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ),
@@ -450,38 +459,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         fillColor: const Color(0xFFFFF0E0),
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.black),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 14,
-          horizontal: 12,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPasswordField({
-    required String hint,
-    required bool obscure,
-    required VoidCallback onToggle,
-  }) {
-    return TextField(
-      obscureText: obscure,
-      style: const TextStyle(color: Colors.black),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: const Color(0xFFFFF0E0),
-        hintText: hint,
-        hintStyle: const TextStyle(color: Colors.black),
-        suffixIcon: IconButton(
-          icon: Icon(
-            obscure ? Icons.visibility : Icons.visibility_off,
-            color: const Color(0xFFBD2D01),
-          ),
-          onPressed: onToggle,
-        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,

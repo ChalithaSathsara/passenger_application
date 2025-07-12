@@ -50,7 +50,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.zero,
           ),
           padding: const EdgeInsets.all(12),
           child: SingleChildScrollView(
