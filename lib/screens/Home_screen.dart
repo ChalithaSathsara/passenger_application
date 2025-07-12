@@ -91,37 +91,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Color(0xFFFF6600), width: 1.8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: const TextField(
-        decoration: InputDecoration(
-          hintText: "Central Bus Stand - Colombo",
-          border: InputBorder.none,
-          icon: Icon(
-            Icons.near_me,
-            color: Color.fromARGB(255, 8, 8, 8),
-            size: 20,
-          ),
-          suffixIcon: Icon(Icons.search, color: Color(0xFFFF6600)),
-        ),
-      ),
-    );
-  }
-
   Widget _buildSectionLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, bottom: 8),
@@ -300,14 +269,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildGradientButtonSmall("View Live Map"),
-                  const SizedBox(height: 8),
-                  _buildGradientButtonSmall("Plan Trip"),
-                ],
-              ),
+              child: _buildGradientButtonSmall("Plan Trip"),
             ),
           ],
         ),
@@ -363,12 +325,6 @@ class _HomeScreenState extends State<HomeScreen> {
             Navigator.pushNamed(
               context,
               '/tripPlanner',
-              arguments: {'passengerId': widget.passengerId},
-            );
-          } else if (label == "View Live Map") {
-            Navigator.pushNamed(
-              context,
-              '/liveMap',
               arguments: {'passengerId': widget.passengerId},
             );
           }
@@ -526,7 +482,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 12),
-                      _buildSearchBar(),
                       _buildSectionLabel("Suggestion"),
                       _buildSuggestions(),
                       const SizedBox(height: 10),
