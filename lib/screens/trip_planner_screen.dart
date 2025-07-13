@@ -1,5 +1,7 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class TripPlannerScreen extends StatefulWidget {
   final String passengerId;
@@ -18,11 +20,147 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   final TextEditingController _startController = TextEditingController();
   final TextEditingController _destinationController = TextEditingController();
 
+  // Bus stop search variables
+  List<Map<String, dynamic>> _startSuggestions = [];
+  List<Map<String, dynamic>> _destinationSuggestions = [];
+  bool _showStartSuggestions = false;
+  bool _showDestinationSuggestions = false;
+  bool _isLoadingStart = false;
+  bool _isLoadingDestination = false;
+
   @override
   void dispose() {
     _startController.dispose();
     _destinationController.dispose();
     super.dispose();
+  }
+
+  // Search bus stops for starting point
+  Future<void> _searchStartStops(String query) async {
+    if (query.length < 2) {
+      setState(() {
+        _startSuggestions = [];
+        _showStartSuggestions = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoadingStart = true;
+      _showStartSuggestions = true;
+    });
+
+    try {
+      final url =
+          'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/BusStop/search/firebase/$query';
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          _startSuggestions = data
+              .map(
+                (item) => {
+                  'stopName': item['stopName'],
+                  'stopLatitude': item['stopLatitude'],
+                  'stopLongitude': item['stopLongitude'],
+                },
+              )
+              .toList();
+          _isLoadingStart = false;
+        });
+      } else if (response.statusCode == 404) {
+        setState(() {
+          _startSuggestions = [];
+          _isLoadingStart = false;
+          _showStartSuggestions =
+              true; // Keep showing the dropdown with "No stops found"
+        });
+      } else {
+        setState(() {
+          _startSuggestions = [];
+          _isLoadingStart = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _startSuggestions = [];
+        _isLoadingStart = false;
+      });
+    }
+  }
+
+  // Search bus stops for destination
+  Future<void> _searchDestinationStops(String query) async {
+    if (query.length < 2) {
+      setState(() {
+        _destinationSuggestions = [];
+        _showDestinationSuggestions = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoadingDestination = true;
+      _showDestinationSuggestions = true;
+    });
+
+    try {
+      final url =
+          'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/BusStop/search/firebase/$query';
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          _destinationSuggestions = data
+              .map(
+                (item) => {
+                  'stopName': item['stopName'],
+                  'stopLatitude': item['stopLatitude'],
+                  'stopLongitude': item['stopLongitude'],
+                },
+              )
+              .toList();
+          _isLoadingDestination = false;
+        });
+      } else if (response.statusCode == 404) {
+        setState(() {
+          _destinationSuggestions = [];
+          _isLoadingDestination = false;
+          _showDestinationSuggestions =
+              true; // Keep showing the dropdown with "No stops found"
+        });
+      } else {
+        setState(() {
+          _destinationSuggestions = [];
+          _isLoadingDestination = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _destinationSuggestions = [];
+        _isLoadingDestination = false;
+      });
+    }
+  }
+
+  // Select start stop
+  void _selectStartStop(Map<String, dynamic> stop) {
+    setState(() {
+      _startController.text = stop['stopName'];
+      _showStartSuggestions = false;
+      _startSuggestions = [];
+    });
+  }
+
+  // Select destination stop
+  void _selectDestinationStop(Map<String, dynamic> stop) {
+    setState(() {
+      _destinationController.text = stop['stopName'];
+      _showDestinationSuggestions = false;
+      _destinationSuggestions = [];
+    });
   }
 
   Widget _buildHeader() {
@@ -85,53 +223,184 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
           ),
           const SizedBox(width: 10),
 
-          // TextFields
+          // TextFields with suggestions
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
-                  height: 44,
-                  child: TextField(
-                    controller: _startController,
-                    onSubmitted: (_) {
-                      setState(() {
-                        showPanel = true;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: "Choose starting point",
-                      hintStyle: const TextStyle(color: Colors.black54),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
+                // Starting point field with suggestions
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 44,
+                      child: TextField(
+                        controller: _startController,
+                        onChanged: (value) {
+                          _searchStartStops(value);
+                        },
+                        onSubmitted: (_) {
+                          setState(() {
+                            showPanel = true;
+                            _showStartSuggestions = false;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          hintText: "Choose starting point",
+                          hintStyle: const TextStyle(color: Colors.black54),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                          ),
+                          border: _border(),
+                          enabledBorder: _border(),
+                          focusedBorder: _border(),
+                        ),
                       ),
-                      border: _border(),
-                      enabledBorder: _border(),
-                      focusedBorder: _border(),
                     ),
-                  ),
+
+                    // Start suggestions dropdown
+                    if (_showStartSuggestions)
+                      Container(
+                        margin: const EdgeInsets.only(top: 4),
+                        constraints: const BoxConstraints(maxHeight: 200),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: Colors.grey.shade300),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: _isLoadingStart
+                            ? const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Center(
+                                  child: SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : _startSuggestions.isEmpty
+                            ? const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Text(
+                                  'No stops found',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              )
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: _startSuggestions.length,
+                                itemBuilder: (context, index) {
+                                  final stop = _startSuggestions[index];
+                                  return ListTile(
+                                    dense: true,
+                                    title: Text(
+                                      stop['stopName'],
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                    onTap: () => _selectStartStop(stop),
+                                  );
+                                },
+                              ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 12),
-                SizedBox(
-                  height: 44,
-                  child: TextField(
-                    controller: _destinationController,
-                    onSubmitted: (_) {
-                      setState(() {
-                        showPanel = true;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: "Choose destination",
-                      hintStyle: const TextStyle(color: Colors.black54),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
+
+                // Destination field with suggestions
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 44,
+                      child: TextField(
+                        controller: _destinationController,
+                        onChanged: (value) {
+                          _searchDestinationStops(value);
+                        },
+                        onSubmitted: (_) {
+                          setState(() {
+                            showPanel = true;
+                            _showDestinationSuggestions = false;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          hintText: "Choose destination",
+                          hintStyle: const TextStyle(color: Colors.black54),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                          ),
+                          border: _border(),
+                          enabledBorder: _border(),
+                          focusedBorder: _border(),
+                        ),
                       ),
-                      border: _border(),
-                      enabledBorder: _border(),
-                      focusedBorder: _border(),
                     ),
-                  ),
+
+                    // Destination suggestions dropdown
+                    if (_showDestinationSuggestions)
+                      Container(
+                        margin: const EdgeInsets.only(top: 4),
+                        constraints: const BoxConstraints(maxHeight: 200),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: Colors.grey.shade300),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: _isLoadingDestination
+                            ? const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Center(
+                                  child: SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : _destinationSuggestions.isEmpty
+                            ? const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Text(
+                                  'No stops found',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              )
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: _destinationSuggestions.length,
+                                itemBuilder: (context, index) {
+                                  final stop = _destinationSuggestions[index];
+                                  return ListTile(
+                                    dense: true,
+                                    title: Text(
+                                      stop['stopName'],
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                    onTap: () => _selectDestinationStop(stop),
+                                  );
+                                },
+                              ),
+                      ),
+                  ],
                 ),
               ],
             ),
@@ -644,27 +913,36 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(),
-                  _buildInputFields(),
-                  _buildMapPlaceholder(),
-                  const SizedBox(height: 80),
-                ],
+      body: GestureDetector(
+        onTap: () {
+          // Close suggestions when tapping outside
+          setState(() {
+            _showStartSuggestions = false;
+            _showDestinationSuggestions = false;
+          });
+        },
+        child: Stack(
+          children: [
+            SafeArea(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(),
+                    _buildInputFields(),
+                    _buildMapPlaceholder(),
+                    const SizedBox(height: 80),
+                  ],
+                ),
               ),
             ),
-          ),
-          if (showPanel)
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: _buildBottomPanel(),
-            ),
-        ],
+            if (showPanel)
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: _buildBottomPanel(),
+              ),
+          ],
+        ),
       ),
       bottomNavigationBar: _buildBottomNavBar(),
     );
