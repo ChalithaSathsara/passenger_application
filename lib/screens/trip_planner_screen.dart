@@ -1,7 +1,9 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:convert';
+import '../MapService.dart';
 
 class TripPlannerScreen extends StatefulWidget {
   final String passengerId;
@@ -42,6 +44,23 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   List<Map<String, dynamic>> _busRoutes = [];
   bool _isLoadingBusRoutes = false;
 
+  // Map related variables
+  GoogleMapController? _mapController;
+  Set<Marker> _mapMarkers = {};
+  Set<Polyline> _mapPolylines = {};
+  CameraPosition _initialCameraPosition = const CameraPosition(
+    target: LatLng(6.9271, 79.8612), // Colombo, Sri Lanka
+    zoom: 12,
+  );
+  bool _isLoadingMap = false;
+  String? _mapErrorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMapFromApi();
+  }
+
   @override
   void dispose() {
     _startController.dispose();
@@ -49,6 +68,104 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     _startFocusNode.dispose();
     _destinationFocusNode.dispose();
     super.dispose();
+  }
+
+  // Get the correct base URL for API calls
+  String _getBaseUrl() {
+    // Use the Heroku API URL
+    return 'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com';
+  }
+
+  // Load map from API
+  Future<void> _loadMapFromApi() async {
+    setState(() {
+      _isLoadingMap = true;
+      _mapErrorMessage = null;
+    });
+
+    try {
+      final baseUrl = _getBaseUrl();
+      final url =
+          '$baseUrl/api/Map/passenger-view-live-location?passenger=${widget.passengerId}';
+      print('Attempting to connect to: $url');
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        // Convert API response to MapService format
+        final mapConfig = {
+          "googleMapsApiKey": "AIzaSyAN397HAlCveqhw7idZNJHdhSidLl9rIKA",
+          "initialCameraPosition": {
+            "latitude": 6.9271,
+            "longitude": 79.8612,
+            "zoom": 12,
+            "bearing": 0,
+            "tilt": 0,
+          },
+          "mapOptions": {
+            "mapType": "normal",
+            "zoomControlsEnabled": true,
+            "compassEnabled": true,
+            "myLocationButtonEnabled": true,
+            "trafficEnabled": false,
+            "indoorEnabled": true,
+            "rotateGesturesEnabled": true,
+            "scrollGesturesEnabled": true,
+            "tiltGesturesEnabled": true,
+            "zoomGesturesEnabled": true,
+          },
+          "layers": [
+            {
+              "id": "passenger_live_location",
+              "type": "geojson",
+              "sourceUrl": url, // Use the same API URL as GeoJSON source
+              "renderOptions": {
+                "strokeColor": "#FF6B35",
+                "strokeWidth": 4,
+                "strokeOpacity": 0.8,
+                "followRoads": true,
+                "clusterMarkers": false,
+                "markerIconUrl": null,
+              },
+            },
+          ],
+        };
+
+        final result = await MapService.processMapConfiguration(mapConfig);
+
+        if (result.success) {
+          setState(() {
+            _initialCameraPosition = result.initialCameraPosition;
+            _mapMarkers = result.markers;
+            _mapPolylines = result.polylines;
+            _isLoadingMap = false;
+          });
+
+          // Set the map controller reference
+          if (_mapController != null) {
+            MapService.setMapController(_mapController!);
+          }
+        } else {
+          setState(() {
+            _mapErrorMessage = result.errorMessage;
+            _isLoadingMap = false;
+          });
+        }
+      } else {
+        setState(() {
+          _mapErrorMessage = 'Failed to load map data: ${response.statusCode}';
+          _isLoadingMap = false;
+        });
+      }
+    } catch (e) {
+      print('Map loading error: $e');
+      setState(() {
+        _mapErrorMessage =
+            'Connection failed. Please check:\n\n1. Internet connection is available\n2. Heroku API is accessible\n3. API endpoint is correct';
+        _isLoadingMap = false;
+      });
+    }
   }
 
   // Helper method to format current date and time
@@ -604,20 +721,83 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     );
   }
 
-  Widget _buildMapPlaceholder() {
+  Widget _buildMap() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       height: 400,
       decoration: BoxDecoration(
-        color: Colors.grey.shade200,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.grey.shade400),
       ),
-      child: const Center(
-        child: Text(
-          "Map will be displayed here",
-          style: TextStyle(color: Colors.black54),
-        ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: _isLoadingMap
+            ? Container(
+                color: Colors.grey.shade200,
+                child: const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16),
+                      Text(
+                        'Loading live location map...',
+                        style: TextStyle(color: Colors.black54),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : _mapErrorMessage != null
+            ? Container(
+                color: Colors.grey.shade200,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error, size: 48, color: Colors.red),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Map Error',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 4),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          _mapErrorMessage!,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.black54),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _loadMapFromApi,
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : GoogleMap(
+                onMapCreated: (GoogleMapController controller) {
+                  _mapController = controller;
+                  MapService.setMapController(controller);
+                },
+                initialCameraPosition: _initialCameraPosition,
+                markers: _mapMarkers,
+                polylines: _mapPolylines,
+                myLocationEnabled: true,
+                myLocationButtonEnabled: true,
+                zoomControlsEnabled: true,
+                mapToolbarEnabled: false,
+                compassEnabled: true,
+                onTap: (LatLng position) {
+                  print(
+                    'Map tapped at: ${position.latitude}, ${position.longitude}',
+                  );
+                },
+              ),
       ),
     );
   }
@@ -1199,7 +1379,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                   children: [
                     _buildHeader(),
                     _buildInputFields(),
-                    _buildMapPlaceholder(),
+                    _buildMap(),
                     const SizedBox(height: 80),
                   ],
                 ),
