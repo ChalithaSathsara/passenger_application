@@ -19,6 +19,8 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   int expandedIndex = -1; // For expanding/collapsing itinerary details
   final TextEditingController _startController = TextEditingController();
   final TextEditingController _destinationController = TextEditingController();
+  final FocusNode _startFocusNode = FocusNode();
+  final FocusNode _destinationFocusNode = FocusNode();
 
   // Bus stop search variables
   List<Map<String, dynamic>> _startSuggestions = [];
@@ -32,6 +34,8 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   void dispose() {
     _startController.dispose();
     _destinationController.dispose();
+    _startFocusNode.dispose();
+    _destinationFocusNode.dispose();
     super.dispose();
   }
 
@@ -236,12 +240,14 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                       height: 44,
                       child: TextField(
                         controller: _startController,
+                        focusNode: _startFocusNode,
                         onChanged: (value) {
                           _searchStartStops(value);
                         },
                         onSubmitted: (_) {
+                          // Move focus to destination field
+                          _destinationFocusNode.requestFocus();
                           setState(() {
-                            showPanel = true;
                             _showStartSuggestions = false;
                           });
                         },
@@ -324,6 +330,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                       height: 44,
                       child: TextField(
                         controller: _destinationController,
+                        focusNode: _destinationFocusNode,
                         onChanged: (value) {
                           _searchDestinationStops(value);
                         },
