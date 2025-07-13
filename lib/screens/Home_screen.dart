@@ -158,43 +158,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSuggestions() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.only(left: 16),
-      child: Row(
-        children: [
-          _buildImageCard(
-            "Buses",
-            "assets/images/RedBus.png",
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                '/suggest',
-                arguments: {
-                  'passengerId': widget.passengerId,
-                  'showBuses': true,
-                },
-              );
-            },
-          ),
-          _buildImageCard(
-            "Places",
-            "assets/images/Places.png",
-            onTap: () {
-              final args = {
-                'passengerId': widget.passengerId,
-                'showBuses': false,
-              };
-              print('HomeScreen - Navigating to suggest with args: $args');
-              Navigator.pushNamed(context, '/suggest', arguments: args);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildFavorites() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -482,9 +445,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 12),
-                      _buildSectionLabel("Suggestion"),
-                      _buildSuggestions(),
-                      const SizedBox(height: 10),
                       _buildSectionLabel("Favorites"),
                       _buildFavorites(),
                       _buildMapSection(),
