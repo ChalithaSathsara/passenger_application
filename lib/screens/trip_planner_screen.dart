@@ -30,6 +30,18 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   bool _isLoadingStart = false;
   bool _isLoadingDestination = false;
 
+  // Store selected locations
+  String _selectedStartLocation = "";
+  String _selectedDestinationLocation = "";
+
+  // Store date and time when trip planning is initiated
+  String _tripPlanningDate = "";
+  String _tripPlanningTime = "";
+
+  // Store fetched bus routes
+  List<Map<String, dynamic>> _busRoutes = [];
+  bool _isLoadingBusRoutes = false;
+
   @override
   void dispose() {
     _startController.dispose();
@@ -37,6 +49,119 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     _startFocusNode.dispose();
     _destinationFocusNode.dispose();
     super.dispose();
+  }
+
+  // Helper method to format current date and time
+  void _storeCurrentDateTime() {
+    DateTime now = DateTime.now();
+
+    // Format date as YYYY-MM-DD
+    _tripPlanningDate =
+        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+
+    // Format time as HH:mm:ss (24 hour format)
+    _tripPlanningTime =
+        "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}";
+
+    print(
+      'Trip planning initiated on: $_tripPlanningDate at $_tripPlanningTime',
+    );
+  }
+
+  // Fetch bus routes by stops
+  Future<List<Map<String, dynamic>>> _fetchBusRoutes() async {
+    try {
+      final url =
+          'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/BusRoute/by-stops';
+
+      // Create request body with start and end stops
+      // Try different parameter variations that might be expected by the API
+      final requestBody = {
+        'startStop': _selectedStartLocation,
+        'endStop': _selectedDestinationLocation,
+        'date': _tripPlanningDate,
+        'time': _tripPlanningTime,
+      };
+
+      // Alternative parameter names that might be expected
+      final alternativeRequestBody = {
+        'startStop': _selectedStartLocation,
+        'endStop': _selectedDestinationLocation,
+        'date': _tripPlanningDate,
+        'time': _tripPlanningTime,
+      };
+
+      // Try GET request with query parameters
+      final uri = Uri.parse(url).replace(
+        queryParameters: {
+          'startingPoint': _selectedStartLocation,
+          'endingPoint': _selectedDestinationLocation,
+          'date': _tripPlanningDate,
+          'time': _tripPlanningTime,
+        },
+      );
+
+      print('=== DEBUG INFO ===');
+      print('Selected start location: "$_selectedStartLocation"');
+      print('Selected destination location: "$_selectedDestinationLocation"');
+      print('Trip planning date: "$_tripPlanningDate"');
+      print('Trip planning time: "$_tripPlanningTime"');
+      print('Request URL: $uri');
+      print(
+        'Alternative request URL: ${Uri.parse(url).replace(queryParameters: alternativeRequestBody)}',
+      );
+      print('==================');
+
+      final response = await http.get(uri);
+
+      print('API Response status: ${response.statusCode}');
+      print('API Response headers: ${response.headers}');
+      print('API Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        print('Parsed data length: ${data.length}');
+        print('Parsed data: $data');
+        return data.map((item) => item as Map<String, dynamic>).toList();
+      } else {
+        print('Failed to fetch bus routes: ${response.statusCode}');
+        print('Error response: ${response.body}');
+
+        // Try with alternative parameter names using GET
+        print('Trying with alternative parameter names...');
+        final alternativeUri = Uri.parse(url).replace(
+          queryParameters: {
+            'startStop': _selectedStartLocation,
+            'endStop': _selectedDestinationLocation,
+            'date': _tripPlanningDate,
+            'time': _tripPlanningTime,
+          },
+        );
+
+        final alternativeResponse = await http.get(alternativeUri);
+
+        print(
+          'Alternative API Response status: ${alternativeResponse.statusCode}',
+        );
+        print('Alternative API Response body: ${alternativeResponse.body}');
+
+        if (alternativeResponse.statusCode == 200) {
+          final List<dynamic> data = jsonDecode(alternativeResponse.body);
+          print('Alternative parsed data length: ${data.length}');
+          print('Alternative parsed data: $data');
+          return data.map((item) => item as Map<String, dynamic>).toList();
+        } else {
+          print(
+            'Alternative request also failed: ${alternativeResponse.statusCode}',
+          );
+          return [];
+        }
+      }
+    } catch (e) {
+      print('Error fetching bus routes: $e');
+      print('Error stack trace: ${StackTrace.current}');
+      return [];
+    }
   }
 
   // Search bus stops for starting point
@@ -153,18 +278,23 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   void _selectStartStop(Map<String, dynamic> stop) {
     setState(() {
       _startController.text = stop['stopName'];
+      _selectedStartLocation = stop['stopName']; // Store the selected location
       _showStartSuggestions = false;
       _startSuggestions = [];
     });
+    print('Selected start location: $_selectedStartLocation');
   }
 
   // Select destination stop
   void _selectDestinationStop(Map<String, dynamic> stop) {
     setState(() {
       _destinationController.text = stop['stopName'];
+      _selectedDestinationLocation =
+          stop['stopName']; // Store the selected location
       _showDestinationSuggestions = false;
       _destinationSuggestions = [];
     });
+    print('Selected destination location: $_selectedDestinationLocation');
   }
 
   Widget _buildHeader() {
@@ -245,11 +375,15 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                           _searchStartStops(value);
                         },
                         onSubmitted: (_) {
-                          // Move focus to destination field
+                          // Store the typed location and move focus to destination field
+                          _selectedStartLocation = _startController.text;
                           _destinationFocusNode.requestFocus();
                           setState(() {
                             _showStartSuggestions = false;
                           });
+                          print(
+                            'Stored start location from typing: $_selectedStartLocation',
+                          );
                         },
                         decoration: InputDecoration(
                           hintText: "Choose starting point",
@@ -334,11 +468,38 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                         onChanged: (value) {
                           _searchDestinationStops(value);
                         },
-                        onSubmitted: (_) {
+                        onSubmitted: (_) async {
+                          // Store the typed destination location
+                          _selectedDestinationLocation =
+                              _destinationController.text;
+
+                          // Store current date and time
+                          _storeCurrentDateTime();
+
                           setState(() {
+                            _isLoadingBusRoutes = true;
                             showPanel = true;
                             _showDestinationSuggestions = false;
                           });
+
+                          // Fetch bus routes
+                          final routes = await _fetchBusRoutes();
+
+                          setState(() {
+                            _busRoutes = routes;
+                            _isLoadingBusRoutes = false;
+                          });
+
+                          print(
+                            'Stored destination location from typing: $_selectedDestinationLocation',
+                          );
+                          print(
+                            'Trip planning: $_selectedStartLocation → $_selectedDestinationLocation',
+                          );
+                          print(
+                            'Date: $_tripPlanningDate, Time: $_tripPlanningTime',
+                          );
+                          print('Found ${_busRoutes.length} bus routes');
                         },
                         decoration: InputDecoration(
                           hintText: "Choose destination",
@@ -462,37 +623,25 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   }
 
   Widget _buildBottomPanel() {
-    final itineraries = [
-      {
-        "bus": "No. 05",
-        "travelTime": "Around 2.5 hours",
-        "distance": "93.4km",
-        "departure": "1.15 p.m.",
-        "arrival": "3.45 p.m.",
-        "route": [
-          "Kurunegala",
-          "Polgahawela",
-          "Alawwa",
-          "Warakapola",
-          "Veyangoda",
-          "Nittambuwa",
-          "Yakkala",
-          "Kadawatha",
-          "Paliyagoda",
-          "Colombo",
-        ],
-      },
-      {
-        "bus": "No. EX4-6",
-        "travelTime": "Around 2 hours 10 min",
-        "distance": "102km",
-      },
-      {
-        "bus": "No. 34/1",
-        "travelTime": "Around 2.5 hours",
-        "distance": "112.4km",
-      },
-    ];
+    // Use fetched bus routes instead of hardcoded data
+    final itineraries = _busRoutes.map((route) {
+      final routeData = route['route'] as Map<String, dynamic>;
+      final shifts = route['shifts'] as List<dynamic>;
+
+      return {
+        "bus": routeData['routeNumber'] ?? "N/A",
+        "routeName": routeData['routeName'] ?? "N/A",
+        "travelTime": shifts.isNotEmpty
+            ? shifts[0]['travelTime'] ?? "N/A"
+            : "N/A",
+        "departure": shifts.isNotEmpty
+            ? shifts[0]['startTime'] ?? "N/A"
+            : "N/A",
+        "arrival": shifts.isNotEmpty ? shifts[0]['endTime'] ?? "N/A" : "N/A",
+        "date": shifts.isNotEmpty ? shifts[0]['date'] ?? "N/A" : "N/A",
+        "route": routeData['routeStops'] ?? [],
+      };
+    }).toList();
 
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
@@ -544,203 +693,316 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
 
               // Itinerary List with scrolling
               Expanded(
-                child: ListView.builder(
-                  controller: controller,
-                  itemCount: itineraries.length,
-                  itemBuilder: (context, index) {
-                    final item = itineraries[index];
-                    final isExpanded = expandedIndex == index;
-
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Top Row
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Icon(
-                                Icons.directions_bus,
-                                color: Colors.black,
+                child: _isLoadingBusRoutes
+                    ? const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(color: Colors.white),
+                            SizedBox(height: 16),
+                            Text(
+                              'Searching for bus routes...',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
                               ),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Column(
+                            ),
+                          ],
+                        ),
+                      )
+                    : itineraries.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'No bus routes found for this trip',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      )
+                    : ListView.builder(
+                        controller: controller,
+                        itemCount: itineraries.length,
+                        itemBuilder: (context, index) {
+                          final item = itineraries[index];
+                          final isExpanded = expandedIndex == index;
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Top Row
+                                Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      (item["bus"] ?? "").toString(),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                    const Icon(
+                                      Icons.directions_bus,
+                                      color: Colors.black,
                                     ),
-                                    const SizedBox(height: 2),
-                                    if (!isExpanded) ...[
-                                      Text(
-                                        "Travel Time: ${item["travelTime"]}",
-                                      ),
-                                      Text("Distance: ${item["distance"]}"),
-                                    ],
-                                    if (isExpanded) ...[
-                                      Text(
-                                        "Departure Time: ${item["departure"] ?? "-"}",
-                                      ),
-                                      Text(
-                                        "Arrival Time: ${item["arrival"] ?? "-"}",
-                                      ),
-                                      Text(
-                                        "Travel Time: ${item["travelTime"]}",
-                                      ),
-                                      Text("Distance: ${item["distance"]}"),
-                                      const SizedBox(height: 4),
-                                      const Text("Route:"),
-                                      if ((item["route"] as List?) != null)
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            // Timeline
-                                            Column(
+                                    const SizedBox(width: 6),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Route ${item["bus"] ?? ""}",
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                          Text(
+                                            item["routeName"] ?? "",
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          if (!isExpanded) ...[
+                                            Row(
                                               children: [
-                                                const Icon(
-                                                  Icons.radio_button_checked,
-                                                  color: Colors.red,
-                                                  size: 16,
+                                                const Text(
+                                                  'Travel Time: ',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
-                                                Container(
-                                                  width: 2,
-                                                  height:
-                                                      ((item["route"] as List)
-                                                              .length -
-                                                          2) *
-                                                      32,
-                                                  color: Colors.red,
-                                                ),
-                                                const Icon(
-                                                  Icons.location_on,
-                                                  color: Colors.red,
-                                                  size: 16,
-                                                ),
+                                                Text(item["travelTime"] ?? "-"),
                                               ],
                                             ),
-                                            const SizedBox(width: 6),
-                                            // Stop Names
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: List.generate(
-                                                  (item["route"] as List)
-                                                      .length,
-                                                  (i) => Padding(
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Date: ',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                Text(item["date"] ?? "-"),
+                                              ],
+                                            ),
+                                          ],
+                                          if (isExpanded) ...[
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Departure Time: ',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                Text(item["departure"] ?? "-"),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Arrival Time: ',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                Text(item["arrival"] ?? "-"),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Travel Time: ',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                Text(item["travelTime"] ?? "-"),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Date: ',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                Text(item["date"] ?? "-"),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 4),
+                                            const Text(
+                                              "Route:",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            if ((item["route"] as List?) !=
+                                                null)
+                                              Column(
+                                                children: List.generate((item["route"] as List).length, (
+                                                  i,
+                                                ) {
+                                                  final stops =
+                                                      item["route"] as List;
+                                                  final isFirst = i == 0;
+                                                  final isLast =
+                                                      i == stops.length - 1;
+                                                  return Column(
+                                                    children: [
+                                                      Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center, // Center vertically
+                                                        children: [
+                                                          Container(
+                                                            width:
+                                                                24, // fixed width for alignment
+                                                            alignment: Alignment
+                                                                .center,
+                                                            child: isFirst
+                                                                ? const Icon(
+                                                                    Icons
+                                                                        .radio_button_checked,
+                                                                    color: Colors
+                                                                        .red,
+                                                                    size: 18,
+                                                                  )
+                                                                : isLast
+                                                                ? const Icon(
+                                                                    Icons
+                                                                        .location_on,
+                                                                    color: Colors
+                                                                        .red,
+                                                                    size: 18,
+                                                                  )
+                                                                : Container(
+                                                                    width: 7,
+                                                                    height: 7,
+                                                                    decoration: const BoxDecoration(
+                                                                      color: Colors
+                                                                          .red,
+                                                                      shape: BoxShape
+                                                                          .circle,
+                                                                    ),
+                                                                  ),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 6,
+                                                          ),
+                                                          Expanded(
+                                                            child: Align(
+                                                              alignment: Alignment
+                                                                  .centerLeft,
+                                                              child: Text(
+                                                                stops[i],
+                                                                style: const TextStyle(
+                                                                  height: 1.2,
+                                                                ), // Optional: tweak for better vertical alignment
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 12,
+                                                      ), // Increased space between stops
+                                                    ],
+                                                  );
+                                                }),
+                                              ),
+                                            Align(
+                                              alignment: Alignment.bottomRight,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                  top: 4,
+                                                ),
+                                                child: ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        const Color.fromARGB(
+                                                          255,
+                                                          234,
+                                                          118,
+                                                          10,
+                                                        ),
+                                                    elevation: 4,
+                                                    shadowColor: Colors.black
+                                                        .withOpacity(0.6),
+                                                    shape:
+                                                        const StadiumBorder(), // <-- Makes it fully rounded
                                                     padding:
                                                         const EdgeInsets.symmetric(
-                                                          vertical: 6,
+                                                          horizontal: 24,
+                                                          vertical: 12,
                                                         ),
-                                                    child: Text(
-                                                      (item["route"]
-                                                          as List)[i],
+                                                  ),
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      showPanel = false;
+                                                    });
+                                                    Navigator.pushNamed(
+                                                      context,
+                                                      '/liveMap',
+                                                      arguments: {
+                                                        'passengerId':
+                                                            widget.passengerId,
+                                                      },
+                                                    );
+                                                  },
+                                                  child: const Text(
+                                                    "View Map",
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.w600,
                                                     ),
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           ],
-                                        ),
-                                      Align(
-                                        alignment: Alignment.bottomRight,
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            top: 4,
-                                          ),
-                                          child: ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  const Color.fromARGB(
-                                                    255,
-                                                    234,
-                                                    118,
-                                                    10,
-                                                  ),
-                                              elevation: 4,
-                                              shadowColor: Colors.black
-                                                  .withOpacity(0.6),
-                                              shape:
-                                                  const StadiumBorder(), // <-- Makes it fully rounded
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 24,
-                                                    vertical: 12,
-                                                  ),
-                                            ),
-                                            onPressed: () {
-                                              setState(() {
-                                                showPanel = false;
-                                              });
-                                              Navigator.pushNamed(
-                                                context,
-                                                '/liveMap',
-                                                arguments: {
-                                                  'passengerId':
-                                                      widget.passengerId,
-                                                },
-                                              );
-                                            },
-                                            child: const Text(
-                                              "View Map",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                        ],
                                       ),
-                                    ],
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.favorite_border,
+                                        color: Colors.red,
+                                      ),
+                                      onPressed: () {
+                                        // Add to favorite logic
+                                      },
+                                    ),
                                   ],
                                 ),
-                              ),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.favorite_border,
-                                  color: Colors.red,
+                                // Expand/Collapse Button
+                                Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: IconButton(
+                                    icon: Icon(
+                                      isExpanded
+                                          ? Icons.expand_less
+                                          : Icons.expand_more,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        expandedIndex = isExpanded ? -1 : index;
+                                      });
+                                    },
+                                  ),
                                 ),
-                                onPressed: () {
-                                  // Add to favorite logic
-                                },
-                              ),
-                            ],
-                          ),
-                          // Expand/Collapse Button
-                          Align(
-                            alignment: Alignment.bottomRight,
-                            child: IconButton(
-                              icon: Icon(
-                                isExpanded
-                                    ? Icons.expand_less
-                                    : Icons.expand_more,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  expandedIndex = isExpanded ? -1 : index;
-                                });
-                              },
+                              ],
                             ),
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               ),
 
               // Bottom Button
