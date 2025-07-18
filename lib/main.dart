@@ -46,7 +46,13 @@ class MyApp extends StatelessWidget {
           final passengerId = args?['passengerId'] as String? ?? '';
           return ProfileScreen(passengerId: passengerId);
         },
-        '/feedback': (context) => const FeedbackScreen(),
+        '/feedback': (context) {
+          final args =
+              ModalRoute.of(context)!.settings.arguments
+                  as Map<String, dynamic>?;
+          final passengerId = args?['passengerId'] as String? ?? '';
+          return FeedbackScreen(passengerId: passengerId);
+        },
         '/helpAndSupport': (context) => const HelpAndSupport(),
         '/aboutUs': (context) => const AboutUsScreen(),
         '/login': (context) => const Logingscreen(),

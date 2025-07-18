@@ -138,13 +138,7 @@ class AboutUsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           const Text(
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. "
-            "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, "
-            "when an unknown printer took a galley of type and scrambled it to make a type specimen book. "
-            "It has survived not only five centuries, but also the leap into electronic typesetting, "
-            "remaining essentially unchanged.\n\n"
-            "It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, "
-            "and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+            "Bus Finder Passenger App is dedicated to making your daily commute easier, smarter, and more reliable. Our mission is to empower passengers with real-time information, intuitive trip planning, and seamless access to public transportation. With features like live bus tracking, trip planning, favourite places, and instant notifications, we help you navigate your city with confidence and convenience. Whether you’re a daily commuter or an occasional traveler, Bus Finder is your trusted companion for a smooth and stress-free journey. We are committed to continuous improvement and value your feedback to make public transport better for everyone.",
             style: TextStyle(
               fontSize: 14,
               color: Colors.black, // Body text in black

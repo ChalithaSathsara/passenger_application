@@ -139,7 +139,11 @@ class _MoreScreenState extends State<MoreScreen> {
             icon: Icons.feedback,
             text: "Feedback",
             onTap: () {
-              Navigator.pushNamed(context, '/feedback');
+              Navigator.pushNamed(
+                context,
+                '/feedback',
+                arguments: {'passengerId': widget.passengerId},
+              );
             },
           ),
           const SizedBox(height: 20),

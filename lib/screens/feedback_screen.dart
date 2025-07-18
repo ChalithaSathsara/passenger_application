@@ -1,13 +1,71 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class FeedbackScreen extends StatefulWidget {
-  const FeedbackScreen({super.key});
+  final String passengerId;
+  const FeedbackScreen({super.key, required this.passengerId});
 
   @override
   State<FeedbackScreen> createState() => _FeedbackScreenState();
 }
 
 class _FeedbackScreenState extends State<FeedbackScreen> {
+  final TextEditingController _subjectController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
+  String? _subjectError;
+  String? _messageError;
+
+  @override
+  void dispose() {
+    _subjectController.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submitFeedback() async {
+    setState(() {
+      _subjectError = _subjectController.text.trim().isEmpty
+          ? 'Subject is required'
+          : null;
+      _messageError = _messageController.text.trim().isEmpty
+          ? 'Message is required'
+          : null;
+    });
+    if (_subjectError != null || _messageError != null) return;
+
+    final url = Uri.parse(
+      'https://bus-finder-sl-a7c6a549fbb1.herokuapp.com/api/Feedback',
+    );
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'passengerId': widget.passengerId,
+        'subject': _subjectController.text.trim(),
+        'message': _messageController.text.trim(),
+      }),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Feedback submitted successfully!')),
+      );
+      _subjectController.clear();
+      _messageController.clear();
+      setState(() {
+        _subjectError = null;
+        _messageError = null;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to submit feedback: \\${response.statusCode}'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,13 +177,29 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          _buildTextField(hint: "Name"),
+          _buildTextField(hint: "Subject", controller: _subjectController),
+          if (_subjectError != null)
+            Padding(
+              padding: const EdgeInsets.only(left: 4, top: 2, bottom: 6),
+              child: Text(
+                _subjectError!,
+                style: const TextStyle(color: Colors.red, fontSize: 12),
+              ),
+            ),
           const SizedBox(height: 12),
-          _buildTextField(hint: "Email"),
-          const SizedBox(height: 12),
-          _buildTextField(hint: "Subject"),
-          const SizedBox(height: 12),
-          _buildTextField(hint: "Message", maxLines: 5),
+          _buildTextField(
+            hint: "Message",
+            maxLines: 5,
+            controller: _messageController,
+          ),
+          if (_messageError != null)
+            Padding(
+              padding: const EdgeInsets.only(left: 4, top: 2, bottom: 6),
+              child: Text(
+                _messageError!,
+                style: const TextStyle(color: Colors.red, fontSize: 12),
+              ),
+            ),
           const SizedBox(height: 16),
           Align(
             alignment: Alignment.centerRight,
@@ -135,9 +209,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               shadowColor: Colors.black.withOpacity(0.7),
               child: InkWell(
                 borderRadius: BorderRadius.circular(10),
-                onTap: () {
-                  // Handle submit
-                },
+                onTap: _submitFeedback,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -173,8 +245,13 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     );
   }
 
-  Widget _buildTextField({required String hint, int maxLines = 1}) {
+  Widget _buildTextField({
+    required String hint,
+    int maxLines = 1,
+    TextEditingController? controller,
+  }) {
     return TextField(
+      controller: controller,
       maxLines: maxLines,
       style: const TextStyle(color: Colors.black),
       decoration: InputDecoration(
