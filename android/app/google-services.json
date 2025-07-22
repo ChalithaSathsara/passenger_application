@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "728140840060",
+    "project_id": "bus-finder-sl-cf78f",
+    "storage_bucket": "bus-finder-sl-cf78f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:728140840060:android:f572f6afc2709a8f765df9",
+        "android_client_info": {
+          "package_name": "com.example.passenger_app3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "728140840060-5eqnf2q62qfmr7mce6ei01q6ubv03hkh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.passenger_app3",
+            "certificate_hash": "ed0c5effbd7667d15d9ea69b0cf43c98ee76d566"
+          }
+        },
+        {
+          "client_id": "728140840060-jrn4u2qmtsh6bc44lehum2v2gmgdrssa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCT7xDHnI8Yrq1q2GBKiRUi_dAfIv8mYcI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "728140840060-jrn4u2qmtsh6bc44lehum2v2gmgdrssa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

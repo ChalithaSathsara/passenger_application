@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "344449743575",
+    "project_id": "gothic-calling-463304-p8",
+    "storage_bucket": "gothic-calling-463304-p8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:344449743575:android:passenger_app",
+        "android_client_info": {
+          "package_name": "com.example.passenger_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "344449743575-at1iv5mb6k8jb596slpigtrbp0puujk7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8lde8YBVpceHOohjJoIDot3heO9gMjQA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "344449743575-at1iv5mb6k8jb596slpigtrbp0puujk7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
